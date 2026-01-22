@@ -96,9 +96,13 @@ export default function Home() {
   <ArrowDown size={16} />
 </a>
 
-            <button className="flex-1 md:w-auto px-6 py-3 md:px-8 md:py-4 border border-white/10 bg-white/5 backdrop-blur-sm rounded-full text-xs md:text-base hover:bg-white/10 transition active:scale-95 flex items-center justify-center gap-2">
-              Let's Chat <MessageCircle size={16} />
-            </button>
+            <a 
+  href="mailto:ariyansamal1201@gmail.com"
+  className="flex-1 md:w-auto px-6 py-3 md:px-8 md:py-4 bg-white/5 border border-white/10 text-white text-xs md:text-base font-bold rounded-full hover:bg-white/10 hover:border-purple-500/50 transition transform active:scale-95 flex items-center justify-center gap-2"
+>
+  Let's Chat 
+  <MessageCircle size={16} className="text-purple-400" />
+</a>
           </div>
         </motion.div>
 
