@@ -111,141 +111,120 @@ const EXPERTISE = [
   }
 ];
 
-// --- 2. PERFECTLY SMOOTH EXPERIENCE TIMELINE ---
+// --- 2. MOBILE-FIXED SMOOTH TIMELINE ---
 function ExperienceTimeline() {
   const targetRef = useRef(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   
+  // Detect mobile for responsive padding
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const { scrollYProgress } = useScroll({
     target: targetRef,
     offset: ["start end", "end start"]
   });
 
-  // FIXED: Start at 0%, PERFECT 60FPS spring physics
-  const x = useSpring(useTransform(scrollYProgress, [0, 1], ["0%", "-92%"]), {
-    stiffness: 150,
-    damping: 30,
-    mass: 0.5
+  // MOBILE-FIXED: Different ranges for mobile/desktop
+  const mobilePadding = isMobile ? "pl-8" : "pl-16 md:pl-[clamp(450px,45vw,650px)]";
+  const scrollRange = isMobile ? "-85%" : "-92%";
+  
+  const x = useSpring(useTransform(scrollYProgress, [0, 1], ["0%", scrollRange]), {
+    stiffness: 120,
+    damping: 35,
+    mass: 0.4
   });
 
-  // Only apply transform AFTER initial load to prevent jump
-  const displayX = isLoaded ? x : "0%";
-
-  // Set loaded after first render
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoaded(true), 50);
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
-    <div ref={targetRef} className="relative h-[480vh] bg-black">
+    <div ref={targetRef} className="relative h-[450vh] bg-black">
       
-      {/* ULTRA-OPTIMIZED 60FPS CONTAINER */}
-      <div 
-        className="sticky top-0 h-screen flex items-center"
-        style={{
-          transform: 'translateZ(0)',
-          backfaceVisibility: 'hidden',
-          WebkitBackfaceVisibility: 'hidden',
-          perspective: '1000px'
-        }}
-      >
+      {/* MOBILE-OPTIMIZED CONTAINER */}
+      <div className="sticky top-0 h-screen flex items-center overflow-hidden">
         
-        {/* Optimized grid background */}
-        <div 
-          className="absolute inset-0 opacity-75 pointer-events-none"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)
-            `,
-            backgroundSize: '50px 50px'
-          }}
-        />
+        {/* Optimized background */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
 
-        {/* Fixed title */}
-        <div className="absolute top-12 left-6 md:left-24 z-20 pointer-events-none">
-          <h3 className="text-4xl md:text-6xl font-bold text-white mb-2 leading-tight">
+        {/* Responsive title */}
+        <div className="absolute top-8 left-4 md:left-24 z-20 pointer-events-none">
+          <h3 className={`${isMobile ? 'text-2xl md:text-4xl' : 'text-4xl md:text-6xl'} font-bold text-white mb-1 leading-tight`}>
             My <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-emerald-400 to-teal-500">Journey.</span>
           </h3>
-          <div className="flex items-center gap-2 text-slate-500 text-sm animate-pulse mt-4">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-ping"></span>
-            Scroll to explore timeline
+          <div className="flex items-center gap-1.5 text-xs md:text-sm text-slate-500 animate-pulse mt-2">
+            <span className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-green-500 animate-ping"></span>
+            Scroll to explore
           </div>
         </div>
 
-        {/* PERFECTLY SMOOTH TIMELINE - 60FPS GUARANTEED */}
+        {/* PERFECT MOBILE TIMELINE */}
         <motion.div 
-          style={{ x: displayX }}
-          className="flex gap-0 items-center pl-16 md:pl-[clamp(450px,45vw,650px)] relative z-10"
-          initial={false}
+          style={{ x }}
+          className={`flex gap-0 items-center ${mobilePadding} relative z-10`}
         >
           
-          {/* Timeline line - static optimized */}
-          <div className="absolute top-1/2 left-0 w-[155%] h-[2px] bg-gradient-to-r from-transparent via-green-500/70 to-transparent -translate-y-1/2 z-0" />
+          {/* Timeline line */}
+          <div className="absolute top-1/2 left-0 w-[150%] h-[2px] bg-gradient-to-r from-transparent via-green-500/60 to-transparent -translate-y-1/2 z-0" />
 
           {TIMELINE.map((item, index) => (
             <div 
               key={item.id} 
-              className="relative w-[390px] md:w-[450px] flex-shrink-0 group px-8"
-              style={{ willChange: 'transform' }}
+              className={`relative ${isMobile ? 'w-[280px] px-4' : 'w-[390px] md:w-[450px] px-8'} flex-shrink-0 group`}
             >
               
-              {/* OPTIMIZED NODE - Minimal motion */}
+              {/* Node */}
               <motion.div 
-                className={`absolute top-1/2 left-8 w-4 h-4 rounded-full bg-black border-2 z-20 -translate-y-1/2 -translate-x-1/2 shadow-lg ${item.type === 'work' ? 'border-green-500 shadow-green-500/50' : 'border-blue-500 shadow-blue-500/50'}`}
-                whileHover={{ scale: 1.5 }}
-                transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                className={`absolute top-1/2 left-4 w-3 h-3 md:w-4 md:h-4 rounded-full bg-black border-2 z-20 -translate-y-1/2 -translate-x-1/2 shadow-lg ${item.type === 'work' ? 'border-green-500 shadow-green-500/40' : 'border-blue-500 shadow-blue-500/40'}`}
+                whileHover={{ scale: 1.4 }}
+                transition={{ type: "spring", stiffness: 400 }}
               />
 
-              {/* Static connector - no motion */}
-              <div className={`absolute top-1/2 left-8 w-[2px] h-[50px] bg-gradient-to-b -translate-x-1/2 rounded-full ${item.type === 'work' ? 'from-green-500/60 to-transparent' : 'from-blue-500/60 to-transparent'}`} />
+              {/* Connector */}
+              <div className={`absolute top-1/2 left-4 w-[1.5px] md:w-[2px] h-[45px] bg-gradient-to-b -translate-x-1/2 rounded-full ${item.type === 'work' ? 'from-green-500/50 to-transparent' : 'from-blue-500/50 to-transparent'}`} />
 
-              {/* ULTRA-OPTIMIZED GLASS CARD */}
+              {/* Card */}
               <motion.div 
-                className={`mt-14 p-6 md:p-8 rounded-2xl bg-white/4 border border-white/10 backdrop-blur-xl hover:bg-white/8 shadow-xl hover:shadow-2xl hover:-translate-y-2 duration-300 ${item.border}`}
-                whileHover={{ 
-                  scale: 1.02,
-                  y: -8
-                }}
-                transition={{ 
-                  type: "spring", 
-                  stiffness: 350, 
-                  damping: 25,
-                  mass: 0.6
-                }}
+                className={`mt-12 ${isMobile ? 'p-4' : 'p-6 md:p-8'} rounded-xl md:rounded-2xl bg-white/3 border border-white/10 backdrop-blur-xl hover:bg-white/6 shadow-lg hover:shadow-xl hover:-translate-y-2 duration-300 ${item.border}`}
+                whileHover={{ scale: 1.015 }}
+                transition={{ type: "spring", stiffness: 350, damping: 30 }}
               >
-                <div className="flex justify-between items-start mb-4">
+                <div className="flex justify-between items-start mb-3 md:mb-4">
                   <div>
-                    <h4 className="text-lg md:text-xl font-bold text-white leading-tight">{item.role}</h4>
-                    <span className="text-xs text-slate-400 uppercase tracking-wider font-bold">{item.type}</span>
+                    <h4 className={`${isMobile ? 'text-base' : 'text-lg md:text-xl'} font-bold text-white leading-tight`}>{item.role}</h4>
+                    <span className={`${isMobile ? 'text-xs' : 'text-xs md:text-sm'} text-slate-400 uppercase tracking-wider font-bold`}>{item.type}</span>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold border border-white/15 backdrop-blur-sm ${item.color}`}>
+                  <span className={`px-2 py-1 ${isMobile ? 'text-xs' : 'text-xs md:text-sm'} font-bold border border-white/15 backdrop-blur-sm rounded-full ${item.color}`}>
                     {item.date}
                   </span>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3 text-slate-300 text-sm mb-6">
-                  <div className="flex items-center gap-2 min-w-0">
-                    {item.type === 'work' ? <Briefcase size={15} className="text-emerald-400" /> : <GraduationCap size={15} className="text-sky-400" />}
+                <div className="flex flex-wrap items-center gap-2 md:gap-3 text-slate-300 text-xs md:text-sm mb-4 md:mb-6">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    {item.type === 'work' ? 
+                      <Briefcase size={isMobile ? 12 : 15} className="text-emerald-400" /> 
+                      : 
+                      <GraduationCap size={isMobile ? 12 : 15} className="text-sky-400" />
+                    }
                     <span className="font-medium truncate">{item.company}</span>
                   </div>
-                  <span className="w-1 h-1 rounded-full bg-slate-500/50 mx-2"></span>
-                  <div className="flex items-center gap-2">
-                    <MapPin size={15} className="text-slate-400" />
+                  <span className={`w-1 h-1 md:w-1 md:h-1 rounded-full bg-slate-500/50 mx-1.5`}></span>
+                  <div className="flex items-center gap-1.5">
+                    <MapPin size={isMobile ? 12 : 15} className="text-slate-400" />
                     <span className="truncate">{item.location}</span>
                   </div>
                 </div>
 
-                <p className="text-slate-200 text-sm leading-relaxed border-l-2 border-white/15 pl-4">
+                <p className={`${isMobile ? 'text-xs' : 'text-sm md:text-base'} text-slate-200 leading-relaxed border-l-2 border-white/15 pl-3 md:pl-4`}>
                   {item.desc}
                 </p>
               </motion.div>
             </div>
           ))}
 
-          {/* End spacer */}
-          <div className="w-[320px] md:w-[380px] flex-shrink-0" />
+          {/* End spacer - MOBILE ADJUSTED */}
+          <div className={`${isMobile ? 'w-[200px]' : 'w-[320px] md:w-[380px]'} flex-shrink-0`} />
 
         </motion.div>
       </div>
@@ -253,16 +232,17 @@ function ExperienceTimeline() {
   );
 }
 
-// --- 3. MAIN COMPONENT (unchanged) ---
+// --- 3. MAIN COMPONENT ---
 export default function About() {
   return (
     <div className="bg-black w-full relative">
       
-      {/* INTRO & EXPERTISE SECTION */}
+      {/* INTRO & EXPERTISE */}
       <section className="w-full min-h-screen relative py-24 md:py-32 overflow-hidden">
         <AboutBackground3D />
 
         <div className="max-w-[1200px] mx-auto px-6 md:px-12 relative z-10">
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center mb-32">
             <div className="space-y-10">
               <motion.div
