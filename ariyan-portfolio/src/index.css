@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: black;
+  color: white;
+  overflow-x: hidden; /* Prevents horizontal scroll */
+  /* NO overflow-y: hidden here! */
+}
+
+/* FIX: Ensure the React root allows scrolling */
+#root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* DELETE ALL CUSTOM SCROLLBAR CODE BELOW THIS LINE */
+/* (If you have ::-webkit-scrollbar stuff here, delete it to remove the white bar) */
