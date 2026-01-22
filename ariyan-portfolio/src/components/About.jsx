@@ -1,8 +1,8 @@
 import { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import { 
   Layout, Server, BrainCircuit, Cpu, Zap, 
-  Briefcase, MapPin, GraduationCap // Added GraduationCap
+  Briefcase, MapPin, GraduationCap 
 } from 'lucide-react';
 import AboutBackground3D from './AboutBackground3D';
 import ScrollRevealText from './ScrollRevealText';
@@ -112,87 +112,150 @@ const EXPERTISE = [
   }
 ];
 
-// --- 2. PINNED HORIZONTAL SCROLL COMPONENT ---
+// --- 2. ULTRA-SMOOTH EXPERIENCE TIMELINE ---
 
 function ExperienceTimeline() {
   const targetRef = useRef(null);
   
   const { scrollYProgress } = useScroll({
     target: targetRef,
+    offset: ["start end", "end start"]
   });
 
-  // Increased scroll range to -92% to fit all 6 items
-  const x = useTransform(scrollYProgress, [0, 1], ["0%", "-92%"]);
+  // ULTRA-SMOOTH: Spring physics + precise range for 6 items
+  const smoothX = useSpring(useTransform(scrollYProgress, [0, 1], ["0%", "-96%"]), {
+    stiffness: 120,
+    damping: 25,
+    mass: 0.8
+  });
+
+  // Subtle parallax scale effect
+  const scale = useSpring(useTransform(scrollYProgress, [0.1, 0.9], [0.98, 1.02]), {
+    stiffness: 200,
+    damping: 20
+  });
 
   return (
-    // Height 500vh: More height = slower, smoother scrolling for more items
-    <div ref={targetRef} className="relative h-[500vh] bg-black">
+    <div ref={targetRef} className="relative h-[520vh] bg-black overflow-clip">
       
-      <div className="sticky top-0 flex h-screen items-center overflow-hidden">
+      {/* GPU-accelerated sticky container */}
+      <div className="sticky top-0 h-screen flex items-center overflow-hidden" style={{
+        WebkitOverflowScrolling: 'touch',
+        willChange: 'transform',
+        transform: 'translateZ(0)',
+        backfaceVisibility: 'hidden'
+      }}>
         
+        {/* Grid background */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none"></div>
 
+        {/* Title - Fixed position */}
         <div className="absolute top-12 left-6 md:left-24 z-20 pointer-events-none">
-            <h3 className="text-4xl md:text-6xl font-bold text-white mb-2">
-              My <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-500">Journey.</span>
-            </h3>
-            <div className="flex items-center gap-2 text-slate-500 text-sm animate-pulse mt-4">
-               <span className="w-2 h-2 rounded-full bg-green-500"></span>
-               Scroll down to explore timeline
-            </div>
+          <h3 className="text-4xl md:text-6xl font-bold text-white mb-2 leading-tight">
+            My <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-emerald-400 to-teal-500">Journey.</span>
+          </h3>
+          <div className="flex items-center gap-2 text-slate-500 text-sm animate-pulse mt-4">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-ping"></span>
+            Scroll to explore timeline
+          </div>
         </div>
 
-        <motion.div style={{ x }} className="flex gap-0 items-center pl-[100px] md:pl-[600px] relative z-10">
+        {/* MAIN SMOOTH TIMELINE */}
+        <motion.div 
+          style={{ 
+            x: smoothX,
+            scale: scale
+          }} 
+          className="flex gap-0 items-center pl-20 md:pl-[clamp(480px,48vw,680px)] relative z-10 origin-left"
+        >
           
-          <div className="absolute top-1/2 left-0 w-[150%] h-[2px] bg-gradient-to-r from-green-500/20 via-green-500 to-transparent transform -translate-y-1/2 z-0"></div>
+          {/* Animated timeline line */}
+          <motion.div 
+            className="absolute top-1/2 left-0 w-[160%] h-[2px] bg-gradient-to-r from-transparent via-green-500/80 to-transparent transform -translate-y-1/2 z-0"
+            initial={{ scaleX: 0, opacity: 0 }}
+            animate={{ scaleX: 1, opacity: 1 }}
+            transition={{ duration: 2, ease: "easeOut" }}
+          />
 
           {TIMELINE.map((item, index) => (
-            <div key={item.id} className="relative w-[400px] md:w-[450px] flex-shrink-0 group px-8">
-               
-               {/* Node */}
-               <div className={`absolute top-1/2 left-8 w-4 h-4 rounded-full bg-black border-2 z-20 transform -translate-y-1/2 -translate-x-1/2 group-hover:scale-150 transition-all duration-300 shadow-[0_0_15px_rgba(34,197,94,0.6)] ${item.type === 'work' ? 'border-green-500 group-hover:bg-green-500' : 'border-blue-500 group-hover:bg-blue-500'}`}></div>
-               
-               {/* Vertical Connector */}
-               <div className={`absolute top-1/2 left-8 w-[2px] h-[40px] bg-gradient-to-b transform -translate-x-1/2 group-hover:h-[60px] transition-all duration-300 ${item.type === 'work' ? 'from-green-500' : 'from-blue-500'} to-transparent`}></div>
+            <div key={item.id} className="relative w-[380px] md:w-[440px] flex-shrink-0 group px-8">
+              
+              {/* SMOOTH GLOWING NODE */}
+              <motion.div 
+                className={`absolute top-1/2 left-8 w-5 h-5 rounded-full bg-black/50 border-3 z-20 transform -translate-y-1/2 -translate-x-1/2 backdrop-blur-sm ${item.type === 'work' ? 'border-green-500/80 shadow-green-500/40' : 'border-blue-500/80 shadow-blue-500/40'}`}
+                whileHover={{ 
+                  scale: 1.8,
+                  boxShadow: item.type === 'work' ? "0 0 40px rgba(34,197,94,0.9)" : "0 0 40px rgba(59,130,246,0.9)"
+                }}
+                transition={{ type: "spring", stiffness: 500, damping: 20 }}
+              />
 
-               {/* Card */}
-               <div className={`mt-16 p-6 md:p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl hover:bg-white/10 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${item.border}`}>
-                  
-                  <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h4 className="text-xl font-bold text-white">{item.role}</h4>
-                        <span className="text-xs text-slate-500 uppercase tracking-wider font-bold">{item.type}</span>
-                      </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold bg-white/5 border border-white/10 ${item.color}`}>
-                        {item.date}
-                      </span>
+              {/* SMOOTH VERTICAL CONNECTOR */}
+              <motion.div 
+                className={`absolute top-1/2 left-8 w-[3px] h-[45px] bg-gradient-to-b transform -translate-x-1/2 backdrop-blur-sm rounded-full ${item.type === 'work' ? 'from-green-500/70 via-green-400/90 to-transparent' : 'from-blue-500/70 via-blue-400/90 to-transparent'}`}
+                whileHover={{ height: "85px" }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+              />
+
+              {/* GLASSMORPHISM CARD */}
+              <motion.div 
+                className={`mt-16 p-7 md:p-9 rounded-3xl bg-white/3 border border-white/12 backdrop-blur-2xl hover:bg-white/7 transition-all duration-700 hover:-translate-y-3 shadow-xl hover:shadow-2xl hover:shadow-green-500/25 ${item.border}`}
+                whileHover={{ 
+                  scale: 1.03,
+                  boxShadow: "0 35px 60px -15px rgba(0, 0, 0, 0.6)"
+                }}
+                transition={{ type: "spring", stiffness: 400, damping: 28 }}
+              >
+                
+                <div className="flex justify-between items-start mb-5">
+                  <div>
+                    <h4 className="text-xl md:text-2xl font-bold text-white leading-tight">{item.role}</h4>
+                    <span className="text-xs md:text-sm text-slate-400 uppercase tracking-widest font-bold">{item.type}</span>
                   </div>
+                  <motion.span 
+                    className={`px-3 py-1.5 rounded-full text-xs md:text-sm font-bold border border-white/20 backdrop-blur-sm ${item.color}`}
+                    whileHover={{ scale: 1.08 }}
+                    transition={{ type: "spring", stiffness: 400 }}
+                  >
+                    {item.date}
+                  </motion.span>
+                </div>
 
-                  <div className="flex items-center gap-3 text-slate-400 text-sm mb-6">
-                     <div className="flex items-center gap-1">
-                        {/* Dynamic Icon based on type */}
-                        {item.type === 'work' ? <Briefcase size={14} /> : <GraduationCap size={14} />} 
-                        {item.company}
-                     </div>
-                     <span className="w-1 h-1 rounded-full bg-slate-600"></span>
-                     <div className="flex items-center gap-1"><MapPin size={14} /> {item.location}</div>
+                <div className="flex flex-wrap items-center gap-4 text-slate-300 text-sm mb-7">
+                  <div className="flex items-center gap-2 min-w-0">
+                    {item.type === 'work' ? 
+                      <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.6 }}>
+                        <Briefcase size={16} className="text-emerald-400 drop-shadow-sm" />
+                      </motion.div> 
+                      : 
+                      <motion.div whileHover={{ rotate: -15 }} transition={{ duration: 0.4 }}>
+                        <GraduationCap size={16} className="text-sky-400 drop-shadow-sm" />
+                      </motion.div>
+                    } 
+                    <span className="font-medium truncate">{item.company}</span>
                   </div>
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-500/50 mx-3 flex-shrink-0"></span>
+                  <div className="flex items-center gap-2">
+                    <MapPin size={16} className="text-slate-400 flex-shrink-0" />
+                    <span className="truncate">{item.location}</span>
+                  </div>
+                </div>
 
-                  <p className="text-slate-300 text-sm leading-relaxed border-l-2 border-white/10 pl-4">
-                     {item.desc}
-                  </p>
-               </div>
+                <p className="text-slate-200 text-sm md:text-base leading-relaxed border-l-3 border-white/20 pl-5 py-3 bg-white/1 rounded-xl backdrop-blur-md shadow-sm">
+                  {item.desc}
+                </p>
+              </motion.div>
             </div>
           ))}
 
-          <div className="w-[300px] flex-shrink-0"></div>
+          {/* Perfect end spacer */}
+          <div className="w-[350px] md:w-[400px] flex-shrink-0 h-1"></div>
 
         </motion.div>
       </div>
     </div>
   );
 }
-
 
 // --- 3. MAIN COMPONENT ---
 
