@@ -65,7 +65,7 @@ const TIMELINE = [
     id: 5,
     type: "education",
     role: "Diploma in Computer Science",
-    company: "Polytechnic",
+    company: "UCP Engineering School",
     location: "Berhampur",
     date: "June 2018 - July 2021",
     desc: "Built a strong foundation in computer science fundamentals, networking, and basic programming logic.",
