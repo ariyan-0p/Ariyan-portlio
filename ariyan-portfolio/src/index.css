@@ -2,8 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Prevents the 'pull-to-refresh' gesture from breaking the 3D canvas on mobile */
+  overscroll-behavior-y: none;
+}
+
 html {
   scroll-behavior: smooth;
+  height: -webkit-fill-available; /* Fix for mobile address bar jumping */
 }
 
 body {
@@ -11,11 +17,21 @@ body {
   padding: 0;
   background-color: black;
   color: white;
-  overflow-x: hidden; /* Prevents horizontal scroll */
-  /* NO overflow-y: hidden here! */
+  overflow-x: hidden;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  /* GPU acceleration for smoother scrolling */
+  -webkit-overflow-scrolling: touch;
 }
 
-/* FIX: Ensure the React root allows scrolling */
+/* FIX: Prevents the 3D Canvas from capturing touch events 
+   intended for scrolling on mobile devices.
+*/
+canvas {
+  touch-action: none;
+  pointer-events: auto;
+}
+
 #root {
   width: 100%;
   min-height: 100vh;
@@ -23,5 +39,8 @@ body {
   flex-direction: column;
 }
 
-/* DELETE ALL CUSTOM SCROLLBAR CODE BELOW THIS LINE */
-/* (If you have ::-webkit-scrollbar stuff here, delete it to remove the white bar) */
+/* Optimization: Prevents text flashing during Framer Motion transitions */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

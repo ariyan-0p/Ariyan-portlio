@@ -1,6 +1,6 @@
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Environment, Float } from '@react-three/drei';
+import { Float, Preload } from '@react-three/drei';
 
 function FloatingShape({ position, rotationSpeed, color, geometryType, scale }) {
   const meshRef = useRef();
@@ -12,37 +12,32 @@ function FloatingShape({ position, rotationSpeed, color, geometryType, scale }) 
     }
   });
 
-  // Logic to choose geometry based on prop
-  let geometry;
-  switch (geometryType) {
-    case 'torus':
-      geometry = <torusKnotGeometry args={[1, 0.3, 100, 16]} />;
-      break;
-    case 'icosahedron':
-      geometry = <icosahedronGeometry args={[1, 0]} />;
-      break;
-    case 'octahedron':
-       geometry = <octahedronGeometry args={[1, 0]} />;
-       break;
-    case 'tetrahedron':
-       geometry = <tetrahedronGeometry args={[1, 0]} />;
-       break;
-    default:
-      geometry = <icosahedronGeometry args={[1, 0]} />;
-  }
+  // Optimization 1: useMemo ensures geometry isn't re-calculated on every frame
+  const geometry = useMemo(() => {
+    switch (geometryType) {
+      case 'torus':
+        // Optimization 2: Reduced segments from [100, 16] to [32, 8] for mobile
+        return <torusKnotGeometry args={[1, 0.3, 32, 8]} />;
+      case 'icosahedron':
+        return <icosahedronGeometry args={[1, 0]} />;
+      case 'octahedron':
+        return <octahedronGeometry args={[1, 0]} />;
+      case 'tetrahedron':
+        return <tetrahedronGeometry args={[1, 0]} />;
+      default:
+        return <icosahedronGeometry args={[1, 0]} />;
+    }
+  }, [geometryType]);
 
   return (
     <Float speed={2} rotationIntensity={1} floatIntensity={1}>
       <mesh ref={meshRef} position={position} scale={scale}>
         {geometry}
-        {/* Wireframe Material for that "Ironman/Blueprint" look */}
-        <meshStandardMaterial
+        <meshBasicMaterial
           color={color}
-          emissive={color}
-          emissiveIntensity={0.8}
           wireframe={true}
           transparent={true}
-          opacity={0.15} // Subtle opacity
+          opacity={0.15}
         />
       </mesh>
     </Float>
@@ -52,55 +47,52 @@ function FloatingShape({ position, rotationSpeed, color, geometryType, scale }) 
 export default function AboutBackground3D() {
   return (
     <div className="absolute inset-0 z-0 pointer-events-none opacity-60">
-      <Canvas camera={{ position: [0, 0, 10] }}>
+      {/* Optimization 3: Limited Device Pixel Ratio and disabled heavy antialiasing */}
+      <Canvas 
+        camera={{ position: [0, 0, 10] }}
+        dpr={[1, 1.5]}
+        gl={{ antialias: false, powerPreference: "high-performance" }}
+      >
         <ambientLight intensity={0.5} />
         
-        {/* EXISTING SHAPES */}
         <FloatingShape 
           position={[-6, 2, -5]} 
           rotationSpeed={{ x: 0.1, y: 0.1 }} 
-          color="#06b6d4" // Cyan
+          color="#06b6d4" 
           geometryType="icosahedron"
           scale={1.5}
         />
         <FloatingShape 
           position={[6, -2, -5]} 
           rotationSpeed={{ x: 0.05, y: 0.08 }} 
-          color="#a855f7" // Purple
+          color="#a855f7" 
           geometryType="torus"
           scale={1.2}
         />
         <FloatingShape 
           position={[0, 5, -10]} 
           rotationSpeed={{ x: 0.1, y: 0.05 }} 
-          color="#3b82f6" // Blue
+          color="#3b82f6" 
           geometryType="icosahedron"
           scale={2}
         />
-
-        {/* --- NEW SHAPES ADDED HERE --- */}
-
-        {/* NEW SHAPE 4: Teal Octahedron (Upper Right) */}
         <FloatingShape 
           position={[5, 4, -6]} 
           rotationSpeed={{ x: 0.08, y: 0.12 }} 
-          color="#2dd4bf" // Teal
+          color="#2dd4bf" 
           geometryType="octahedron"
           scale={1.3}
         />
-
-        {/* NEW SHAPE 5: Pink Tetrahedron (Far Upper Left, Distant) */}
         <FloatingShape 
           position={[-7, 6, -8]} 
           rotationSpeed={{ x: 0.06, y: 0.04 }} 
-          color="#d946ef" // Pink/Fuschia
+          color="#d946ef" 
           geometryType="tetrahedron"
           scale={1.8}
         />
 
-        <Environment preset="city" />
+        <Preload all />
       </Canvas>
-      {/* Gradient Fade to blend with black background */}
       <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black"></div>
     </div>
   );

@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { AnimatePresence } from 'framer-motion';
 
-// Component Imports
-import Background3D from './components/Background3D';
-import Dock from './components/Dock';
-import Home from './components/Home';
-import Collaborations from './components/Collaborations';
-import Projects from './components/Projects';
-import About from './components/About'; // NEW IMPORT
-import Contact from './components/Contact';
+// Critical UI Components (Loaded Immediately)
 import Header from './components/Header';
 import Loader from './components/Loader';
 import Cursor from './components/Cursor';
+import Dock from './components/Dock';
+
+// Heavy Components (Lazy Loaded for Performance)
+const Background3D = lazy(() => import('./components/Background3D'));
+const Home = lazy(() => import('./components/Home'));
+const Collaborations = lazy(() => import('./components/Collaborations'));
+const Projects = lazy(() => import('./components/Projects'));
+const About = lazy(() => import('./components/About'));
+const Contact = lazy(() => import('./components/Contact'));
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -32,36 +34,43 @@ export default function App() {
           <>
             <Cursor />
             <Header />
-            <Background3D />
+            
+            {/* Optimization: Wrap 3D Background in Suspense */}
+            <Suspense fallback={<div className="fixed inset-0 bg-black" />}>
+              <Background3D />
+            </Suspense>
 
             {/* MAIN CONTENT STACK */}
+            {/* Suspense here handles the loading state of all sub-sections */}
             <main className="relative z-10 w-full flex-grow flex flex-col">
-              
-              {/* 1. HOME (Hero) */}
-              <div id="home">
-                 <Home />
-              </div>
+              <Suspense fallback={<div className="h-screen bg-black flex items-center justify-center">Loading...</div>}>
+                
+                {/* 1. HOME (Hero) */}
+                <div id="home">
+                   <Home />
+                </div>
 
-              {/* 2. COLLABORATIONS (Trust) */}
-              <div id="collaborations" className="relative z-20 bg-black/40 backdrop-blur-sm border-t border-white/5">
-                 <Collaborations />
-              </div>
+                {/* 2. COLLABORATIONS (Trust) */}
+                <div id="collaborations" className="relative z-20 bg-black/40 backdrop-blur-sm border-t border-white/5">
+                   <Collaborations />
+                </div>
 
-              {/* 3. WORK (Projects) */}
-              <div id="projects" className="relative z-20 bg-black/20 backdrop-blur-sm">
-                 <Projects />
-              </div>
+                {/* 3. WORK (Projects) */}
+                <div id="projects" className="relative z-20 bg-black/20 backdrop-blur-sm">
+                   <Projects />
+                </div>
 
-              {/* 4. ABOUT (Profile) - NEW SECTION */}
-              <div id="about" className="relative z-20 bg-black">
-                 <About />
-              </div>
+                {/* 4. ABOUT (Profile) */}
+                <div id="about" className="relative z-20 bg-black">
+                   <About />
+                </div>
 
-              {/* 5. CONTACT (Action) */}
-              <div id="contact" className="relative z-20 bg-black">
-                 <Contact />
-              </div>
+                {/* 5. CONTACT (Action) */}
+                <div id="contact" className="relative z-20 bg-black">
+                   <Contact />
+                </div>
 
+              </Suspense>
             </main>
 
             {/* Navigation Dock */}
