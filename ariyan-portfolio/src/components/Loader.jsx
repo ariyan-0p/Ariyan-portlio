@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 
-// --- 1. SCRAMBLE TEXT (Welcomes the user) ---
+// --- 1. SCRAMBLE TEXT ---
 const ScrambleText = () => {
   const targetText = "WELCOME";
   const [text, setText] = useState("INITIALIZING");
@@ -14,9 +14,7 @@ const ScrambleText = () => {
         targetText
           .split("")
           .map((letter, index) => {
-            if (index < iteration) {
-              return targetText[index];
-            }
+            if (index < iteration) return targetText[index];
             return chars[Math.floor(Math.random() * chars.length)];
           })
           .join("")
@@ -38,62 +36,64 @@ const ScrambleText = () => {
   );
 };
 
-// --- 2. THE 'AS' REACTOR LOGO ---
+// --- 2. THE 'AS' REACTOR LOGO (Loading Ring Removed) ---
 const ASReactor = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" className="w-32 h-32 md:w-48 md:h-48">
     <defs>
       <filter id="blue-glow" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="6" result="coloredBlur" />
+        <feGaussianBlur stdDeviation="4" result="coloredBlur" />
         <feMerge>
           <feMergeNode in="coloredBlur" />
           <feMergeNode in="SourceGraphic" />
         </feMerge>
       </filter>
-      <linearGradient id="loader-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stopColor="#00ffff" />
-        <stop offset="100%" stopColor="#0077ff" />
-      </linearGradient>
     </defs>
 
-    {/* Spinning Outer Ring */}
-    <motion.circle
+    {/* STATIC OUTER FRAME: Just a very faint guide ring */}
+    <circle
       cx="100" cy="100" r="90"
-      fill="none" stroke="url(#loader-grad)" strokeWidth="3"
-      strokeDasharray="20 10 50 10"
-      filter="url(#blue-glow)"
-      animate={{ rotate: 360 }}
-      transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-      style={{ originX: "100px", originY: "100px" }}
+      fill="none" stroke="#00ffff" strokeWidth="1" opacity="0.05"
     />
-    
-    {/* Inner Hexagon Frame */}
+
+    {/* ENERGY SEGMENTS: Static reactor details around the logo */}
+    {[...Array(8)].map((_, i) => (
+      <rect 
+        key={i}
+        x="99" y="5" width="2" height="10" 
+        fill="#00ffff" 
+        opacity="0.3"
+        transform={`rotate(${i * 45} 100 100)`} 
+      />
+    ))}
+
+    {/* CENTERED HEXAGON FRAME */}
     <motion.path 
-       d="M100 20 L170 60 V140 L100 180 L30 140 V60 Z"
-       fill="none" stroke="#00ffff" strokeWidth="1" opacity="0.5"
+       d="M100 35 L156.3 67.5 V132.5 L100 165 L43.7 132.5 V67.5 Z"
+       fill="none" stroke="#00ffff" strokeWidth="1" opacity="0.2"
        initial={{ pathLength: 0 }}
        animate={{ pathLength: 1 }}
        transition={{ duration: 1.5 }}
     />
 
-    {/* --- THE 'AS' LOGO ANIMATION --- */}
-    <g transform="translate(50, 50) scale(1)">
+    {/* CENTERED 'AS' LOGO */}
+    <g transform="translate(100, 100)">
         {/* 'A' */}
         <motion.path
-          d="M25 75 L40 30 L55 75 M32 60 H48"
+          d="M-30 25 L-15 -20 L0 25 M-23 10 H-7"
           fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"
           filter="url(#blue-glow)"
           initial={{ pathLength: 0, opacity: 0 }}
           animate={{ pathLength: 1, opacity: 1 }}
-          transition={{ delay: 0.2, duration: 1 }}
+          transition={{ delay: 0.5, duration: 1 }}
         />
         {/* 'S' */}
         <motion.path
-          d="M80 35 H60 L60 52 H80 L80 75 H60"
+          d="M35 -15 H15 L15 2 H35 L35 25 H15"
           fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"
           filter="url(#blue-glow)"
           initial={{ pathLength: 0, opacity: 0 }}
           animate={{ pathLength: 1, opacity: 1 }}
-          transition={{ delay: 0.8, duration: 1 }}
+          transition={{ delay: 1.2, duration: 1 }}
         />
     </g>
   </svg>
@@ -104,7 +104,8 @@ export default function Loader() {
   const [showText, setShowText] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => setShowText(true), 1000);
+    const timer = setTimeout(() => setShowText(true), 800);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
