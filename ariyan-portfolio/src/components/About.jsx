@@ -80,7 +80,7 @@ const TIMELINE = [
     company: "De Paul School",
     location: "Berhampur",
     date: "2018",
-    desc: "Completed secondary education with distinction.",
+    desc: "Completed secondary education.",
     color: "text-slate-400",
     border: "group-hover:border-slate-500/50",
     bg: "group-hover:bg-slate-500/10"
