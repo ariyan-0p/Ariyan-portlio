@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Home, Users, Briefcase, User, Mail } from "lucide-react";
+// Updated imports: Replaced Mail with UserCircle for a proper Contact icon
+import { Home, Users, Briefcase, User, UserCircle } from "lucide-react";
 
 export default function Dock() {
   const [activeTab, setActiveTab] = useState("home");
@@ -10,7 +11,8 @@ export default function Dock() {
     { id: "collaborations", label: "Collabs", icon: <Users size={20} /> },
     { id: "projects", label: "Work", icon: <Briefcase size={20} /> },
     { id: "about", label: "About", icon: <User size={20} /> },
-    { id: "contact", label: "Contact", icon: <Mail size={20} /> },
+    // Updated icon from Mail to UserCircle
+    { id: "contact", label: "Contact", icon: <UserCircle size={20} /> },
   ];
 
   // Performance Optimization: Throttled Scroll Listener
@@ -55,7 +57,6 @@ export default function Dock() {
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 200, damping: 20 }}
-        /* LIQUID GLASS CONTAINER */
         className="flex items-center gap-1 p-1.5 bg-white/[0.03] backdrop-blur-[40px] rounded-full border border-white/10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)] relative"
         style={{
           boxShadow: "inset 0 1px 1px rgba(255,255,255,0.1), 0 25px 50px -12px rgba(0,0,0,0.8)"
@@ -75,7 +76,6 @@ export default function Dock() {
                 {isActive && (
                   <motion.div
                     layoutId="liquid-pill"
-                    /* CLEAN LIQUID PILL: Removed glint line per request */
                     className="absolute inset-0 bg-white/10 border border-white/20 rounded-full z-0"
                     transition={{ 
                         type: "spring", 

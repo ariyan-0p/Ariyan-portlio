@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Mail, Linkedin, MessageCircle } from 'lucide-react';
+import { Mail, Linkedin, MessageCircle, Eye, Phone } from 'lucide-react';
 
 export default function Contact() {
   return (
@@ -28,12 +28,27 @@ export default function Contact() {
               Want to discuss a project, architect a scalable system, or just talk tech? Hit me up!
             </p>
 
-            <a 
-              href="mailto:ariyansamal1201@gmail.com"
-              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-full text-lg hover:shadow-[0_0_30px_rgba(147,51,234,0.5)] transition-all transform hover:-translate-y-1"
-            >
-              Let's Chat <MessageCircle size={20} />
-            </a>
+            <div className="flex flex-col sm:flex-row gap-4">
+              {/* WhatsApp Primary Chat (Works on Laptop & Phone) */}
+              <a 
+                href="https://wa.me/919937643350?text=Hi%20Ariyan,%20I%20saw%20your%20portfolio%20and%20wanted%20to%20connect!"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-full text-lg hover:shadow-[0_0_30px_rgba(147,51,234,0.5)] transition-all transform hover:-translate-y-1"
+              >
+                Let's Chat <MessageCircle size={20} />
+              </a>
+
+              {/* View Resume Button (Matching Home Section) */}
+              <a 
+                href="https://drive.google.com/file/d/1HCPv5xKLeqKqKzcVYqbPBHbWMpvQD321/view?usp=sharing" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-white/5 border border-white/10 text-white font-bold rounded-full text-lg hover:bg-white/10 transition-all transform hover:-translate-y-1"
+              >
+                View Resume <Eye size={20} />
+              </a>
+            </div>
           </motion.div>
 
 
@@ -63,7 +78,7 @@ export default function Contact() {
                 </div>
              </div>
 
-             {/* Socials Block - Updated to only LinkedIn & Mail */}
+             {/* Socials Block - Now includes WhatsApp */}
              <div className="space-y-4">
                 <h3 className="text-slate-500 text-sm font-mono tracking-widest uppercase">Follow Me</h3>
                 <div className="flex gap-4">
@@ -73,6 +88,12 @@ export default function Contact() {
                       href="https://www.linkedin.com/in/ariyan-samal-767614281/" 
                    />
                    
+                   {/* WhatsApp Redirect */}
+                   <SocialLink 
+                      icon={<MessageCircle size={20} />} 
+                      href="https://wa.me/919937643350" 
+                   />
+
                    {/* Email Button */}
                    <SocialLink 
                       icon={<Mail size={20} />} 
@@ -89,7 +110,7 @@ export default function Contact() {
       {/* FOOTER */}
       <div className="w-full text-center py-8 border-t border-white/5 relative z-10">
          <p className="text-slate-600 text-sm">
-           Made with passion by <span className="text-purple-400">Ariyan Samal</span>. © 2026
+            Made with passion by <span className="text-purple-400">Ariyan Samal</span>. © 2026
          </p>
       </div>
 
