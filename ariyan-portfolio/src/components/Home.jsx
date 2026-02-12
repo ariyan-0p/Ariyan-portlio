@@ -83,14 +83,15 @@ export default function Home() {
           </div>
 
           <div className="flex gap-3 pt-2 w-full md:w-auto">
-            {/* UPDATED RESUME BUTTON */}
+            {/* UPDATED RESUME LINK (Opens in new tab) */}
             <a 
-              href="/Ariyan_Samal_Resume.pdf" 
-              download="Ariyan_Samal_Resume.pdf"
+              href="https://ariyan-0p.github.io/Ariyan-portlio/Ariyan_Samal_Resume.pdf" 
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex-1 md:w-auto px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs md:text-base font-bold rounded-full hover:shadow-[0_0_20px_rgba(168,85,247,0.5)] transition transform active:scale-95 flex items-center justify-center gap-2"
             >
               <span className="md:hidden">Resume</span>
-              <span className="hidden md:block">Download Resume</span>
+              <span className="hidden md:block">View Resume</span>
               <ArrowDown size={16} />
             </a>
 
