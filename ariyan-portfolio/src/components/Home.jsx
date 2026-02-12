@@ -1,6 +1,6 @@
 import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
-// Added Eye icon to the imports
-import { Eye, MessageCircle, Code, MapPin } from 'lucide-react';
+// Added Eye and Phone/Message icons
+import { Eye, MessageCircle, Code, MapPin, Send } from 'lucide-react';
 
 // Import Profile Image
 import profileImg from '../assets/profile.jpg'; 
@@ -83,22 +83,24 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="flex gap-3 pt-2 w-full md:w-auto">
-            {/* UPDATED RESUME LINK: Opens Google Drive in new tab with Eye icon */}
+          <div className="flex flex-col md:flex-row gap-3 pt-2 w-full md:w-auto">
+            {/* RESUME LINK: Opens in new tab with Eye icon */}
             <a 
               href="https://drive.google.com/file/d/1HCPv5xKLeqKqKzcVYqbPBHbWMpvQD321/view?usp=sharing" 
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 md:w-auto px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs md:text-base font-bold rounded-full hover:shadow-[0_0_20px_rgba(168,85,247,0.5)] transition transform active:scale-95 flex items-center justify-center gap-2"
+              className="px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs md:text-base font-bold rounded-full hover:shadow-[0_0_20px_rgba(168,85,247,0.5)] transition transform active:scale-95 flex items-center justify-center gap-2"
             >
-              <span className="md:hidden">Resume</span>
-              <span className="hidden md:block">View Resume</span>
+              <span>View Resume</span>
               <Eye size={16} />
             </a>
 
+            {/* ENHANCED CONTACT: WhatsApp Link (Works on Web & Mobile) */}
             <a 
-              href="mailto:ariyansamal1201@gmail.com"
-              className="flex-1 md:w-auto px-6 py-3 md:px-8 md:py-4 bg-white/5 border border-white/10 text-white text-xs md:text-base font-bold rounded-full hover:bg-white/10 hover:border-purple-500/50 transition transform active:scale-95 flex items-center justify-center gap-2"
+              href="https://wa.me/919937643350?text=Hi%20Ariyan,%20I%20saw%20your%20portfolio%20and%20wanted%20to%20connect!"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-3 md:px-8 md:py-4 bg-white/5 border border-white/10 text-white text-xs md:text-base font-bold rounded-full hover:bg-white/10 hover:border-purple-500/50 transition transform active:scale-95 flex items-center justify-center gap-2"
             >
               Let's Chat 
               <MessageCircle size={16} className="text-purple-400" />
