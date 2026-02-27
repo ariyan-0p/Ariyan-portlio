@@ -1,12 +1,12 @@
 import { motion } from 'framer-motion';
 import { 
   Building2,    // Keystone
-  Eye,          // Clearvision
   Rocket,       // Bounten
-  Shirt,        // My Perfect Fit
   BrainCircuit, // Sharkify AI
   Globe,        // Kaizernews
-  ArrowRight    // Added Arrow icon
+  Wrench,       // NTS
+  Home,         // Renobill
+  ArrowRight
 } from 'lucide-react';
 
 const PARTNERS = [
@@ -20,11 +20,11 @@ const PARTNERS = [
   },
   { 
     id: 2, 
-    name: "Clearvision", 
-    icon: <Eye size={24} />,
-    color: "group-hover:text-cyan-400",
-    border: "group-hover:border-cyan-500/50",
-    bg: "group-hover:bg-cyan-500/10"
+    name: "NTS", 
+    icon: <Wrench size={24} />,
+    color: "group-hover:text-orange-400",
+    border: "group-hover:border-orange-500/50",
+    bg: "group-hover:bg-orange-500/10"
   },
   { 
     id: 3, 
@@ -36,11 +36,11 @@ const PARTNERS = [
   },
   { 
     id: 4, 
-    name: "My Perfect Fit", 
-    icon: <Shirt size={24} />,
-    color: "group-hover:text-pink-400",
-    border: "group-hover:border-pink-500/50",
-    bg: "group-hover:bg-pink-500/10"
+    name: "Renobill", 
+    icon: <Home size={24} />,
+    color: "group-hover:text-teal-400",
+    border: "group-hover:border-teal-500/50",
+    bg: "group-hover:bg-teal-500/10"
   },
   { 
     id: 5, 
@@ -129,7 +129,7 @@ export default function Collaborations() {
          </motion.div>
       </div>
 
-      {/* 3. NEW: BOTTOM CTA & TEXT */}
+      {/* 3. BOTTOM CTA & TEXT */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -147,11 +147,11 @@ export default function Collaborations() {
            </h3>
            
           <a 
-  href="mailto:ariyansamal1201@gmail.com"
-  className="px-8 py-3 bg-white text-black font-bold rounded-full hover:scale-105 hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] transition-all flex items-center gap-2"
->
-  Let's Add Your Logo <ArrowRight size={20} />
-</a>
+            href="mailto:ariyansamal1201@gmail.com"
+            className="px-8 py-3 bg-white text-black font-bold rounded-full hover:scale-105 hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] transition-all flex items-center gap-2"
+          >
+            Let's Add Your Logo <ArrowRight size={20} />
+          </a>
         </div>
       </motion.div>
 
