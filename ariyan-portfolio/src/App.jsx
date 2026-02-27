@@ -14,7 +14,7 @@ const Projects = lazy(() => import('./components/Projects'));
 const About = lazy(() => import('./components/About'));
 const Contact = lazy(() => import('./components/Contact'));
 
-// NEW: A professional fallback component
+// A professional fallback component
 const PageFallback = () => (
   <div className="fixed inset-0 bg-black flex flex-col items-center justify-center z-50">
     <motion.div 
@@ -41,7 +41,6 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Timer matches your Loader's 3-second animation + 0.5s buffer
     const timer = setTimeout(() => setIsLoading(false), 3500);
     return () => clearTimeout(timer);
   }, []);
@@ -56,31 +55,26 @@ export default function App() {
           <>
             <Cursor />
             <Header />
-            
-            <Suspense fallback={<div className="fixed inset-0 bg-black" />}>
-              <Background3D />
-            </Suspense>
 
             <main className="relative z-10 w-full flex-grow flex flex-col">
-              {/* UPDATED FALLBACK: Replaces the black screen/text */}
               <Suspense fallback={<PageFallback />}>
                 
                 <div id="home"><Home /></div>
 
                 <div id="collaborations" className="relative z-20 bg-black/40 backdrop-blur-sm border-t border-white/5">
-                   <Collaborations />
+                  <Collaborations />
                 </div>
 
                 <div id="projects" className="relative z-20 bg-black/20 backdrop-blur-sm">
-                   <Projects />
+                  <Projects />
                 </div>
 
                 <div id="about" className="relative z-20 bg-black">
-                   <About />
+                  <About />
                 </div>
 
                 <div id="contact" className="relative z-20 bg-black">
-                   <Contact />
+                  <Contact />
                 </div>
 
               </Suspense>
