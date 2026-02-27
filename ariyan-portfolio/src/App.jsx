@@ -8,7 +8,6 @@ import Cursor from './components/Cursor';
 import Dock from './components/Dock';
 
 // Heavy Components (Lazy Loaded)
-const Background3D = lazy(() => import('./components/Background3D'));
 const Home = lazy(() => import('./components/Home'));
 const Collaborations = lazy(() => import('./components/Collaborations'));
 const Projects = lazy(() => import('./components/Projects'));
