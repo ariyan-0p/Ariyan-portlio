@@ -67,6 +67,15 @@ const PROJECTS = [
     tech: ["MongoDB", "Express", "React", "Node.js"],
     desc: "A personal brand platform built with conviction — content, community, and credibility.",
   },
+  {
+    id: "08",
+    title: "Carvaan Holidays",
+    category: "Travel & Tourism",
+    url: "carvaanholidays.com",
+    link: "https://carvaanholidays.com/",
+    tech: ["React", "Node.js", "Tailwind"],
+    desc: "A travel discovery platform — curated journeys and seamless booking for the modern explorer.",
+  },
 ];
 
 function Card({ project, index }) {
