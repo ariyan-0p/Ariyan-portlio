@@ -120,6 +120,35 @@ const PROJECTS = [
     accent: "#84cc16",
     featured: true,
   },
+  {
+    id: "09",
+    title: "Puravida with Harsha",
+    category: "Wellness & Lifestyle",
+    type: "Web",
+    year: "2026",
+    status: "NEW",
+    url: "puravidawithharsha.com",
+    link: "https://puravidawithharsha.com/",
+    tech: ["React", "Node.js", "MongoDB"],
+    desc: "A wellness platform built around a creator's voice — content, coaching, and community in one calm space.",
+    gradient: "from-emerald-500/30 via-teal-500/10 to-transparent",
+    accent: "#10b981",
+    featured: true,
+  },
+  {
+    id: "10",
+    title: "Eyzo",
+    category: "Digital Product",
+    type: "Web",
+    year: "2026",
+    status: "NEW",
+    url: "eyzo.in",
+    link: "https://eyzo.in/",
+    tech: ["Next.js", "Node.js", "Tailwind"],
+    desc: "A modern digital product experience — crafted for speed, clarity, and a strong first impression.",
+    gradient: "from-sky-500/30 via-blue-500/10 to-transparent",
+    accent: "#0ea5e9",
+  },
 ];
 
 const FILTERS = [
@@ -138,6 +167,8 @@ const SIZE_PATTERN = [
   "md:col-span-1",
   "md:col-span-2",
   "md:col-span-1",
+  "md:col-span-1",
+  "md:col-span-2 md:row-span-2", // big
   "md:col-span-1",
   "md:col-span-1",
 ];
@@ -170,8 +201,8 @@ function ProjectCard({ project, index, sizeClass }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onMouseMove={handleMouseMove}
-      className={`group relative overflow-hidden rounded-[14px] border border-white/[0.08] bg-[#0a0a0a] transition-colors duration-300 hover:border-white/20 ${sizeClass} ${
-        isBig ? "min-h-[380px] md:min-h-[460px]" : "min-h-[260px]"
+      className={`group relative overflow-hidden rounded-[16px] border border-white/[0.08] bg-[#0a0a0a] transition-all duration-500 hover:border-white/25 ${sizeClass} ${
+        isBig ? "min-h-[380px] md:min-h-[460px]" : "min-h-[280px]"
       }`}
       style={{ textDecoration: "none" }}
     >
@@ -179,7 +210,19 @@ function ProjectCard({ project, index, sizeClass }) {
       <div
         className="absolute inset-0 opacity-0 transition-opacity duration-500 pointer-events-none group-hover:opacity-100"
         style={{
-          background: `radial-gradient(400px circle at ${mouse.x}% ${mouse.y}%, ${project.accent}22, transparent 60%)`,
+          background: `radial-gradient(500px circle at ${mouse.x}% ${mouse.y}%, ${project.accent}26, transparent 55%)`,
+        }}
+      />
+
+      {/* Grid backdrop — fades in on hover */}
+      <div
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
+        style={{
+          backgroundImage:
+            `linear-gradient(${project.accent}10 1px, transparent 1px), linear-gradient(90deg, ${project.accent}10 1px, transparent 1px)`,
+          backgroundSize: "32px 32px",
+          maskImage: "radial-gradient(circle at center, black 30%, transparent 75%)",
+          WebkitMaskImage: "radial-gradient(circle at center, black 30%, transparent 75%)",
         }}
       />
 
@@ -192,6 +235,39 @@ function ProjectCard({ project, index, sizeClass }) {
         style={{ background: project.accent }}
       />
 
+      {/* Corner brackets */}
+      {["tl", "tr", "bl", "br"].map((c) => {
+        const pos = {
+          tl: { top: 10, left: 10, borderTop: "1px solid", borderLeft: "1px solid" },
+          tr: { top: 10, right: 10, borderTop: "1px solid", borderRight: "1px solid" },
+          bl: { bottom: 10, left: 10, borderBottom: "1px solid", borderLeft: "1px solid" },
+          br: { bottom: 10, right: 10, borderBottom: "1px solid", borderRight: "1px solid" },
+        }[c];
+        return (
+          <span
+            key={c}
+            aria-hidden
+            className="absolute w-3 h-3 pointer-events-none transition-all duration-500"
+            style={{
+              ...pos,
+              borderColor: hovered ? project.accent : "rgba(255,255,255,0.12)",
+              opacity: hovered ? 1 : 0.5,
+            }}
+          />
+        );
+      })}
+
+      {/* Scan line — sweeps across on hover */}
+      <div
+        className="absolute left-0 right-0 h-px pointer-events-none transition-opacity duration-300"
+        style={{
+          top: hovered ? `${mouse.y}%` : "-2px",
+          background: `linear-gradient(90deg, transparent, ${project.accent}, transparent)`,
+          opacity: hovered ? 0.6 : 0,
+          boxShadow: `0 0 12px ${project.accent}`,
+        }}
+      />
+
       {/* Giant ghosted index number */}
       <div
         className="absolute select-none pointer-events-none font-bold leading-none"
@@ -200,9 +276,10 @@ function ProjectCard({ project, index, sizeClass }) {
           fontSize: isBig ? "clamp(10rem, 22vw, 18rem)" : "clamp(7rem, 14vw, 11rem)",
           right: isBig ? "-1rem" : "-0.5rem",
           bottom: isBig ? "-3rem" : "-2rem",
-          color: hovered ? `${project.accent}14` : "rgba(255,255,255,0.025)",
+          color: hovered ? `${project.accent}1f` : "rgba(255,255,255,0.025)",
           letterSpacing: "-0.06em",
-          transition: "color 0.5s",
+          transition: "color 0.5s, transform 0.5s",
+          transform: hovered ? "translate(-6px, -6px)" : "translate(0,0)",
         }}
       >
         {project.id}
@@ -338,7 +415,7 @@ export default function Projects() {
   const stats = useMemo(
     () => [
       { value: PROJECTS.length.toString().padStart(2, "0"), label: "Projects Shipped" },
-      { value: "4+", label: "Years Building" },
+      { value: "2+", label: "Years Building" },
       { value: new Set(PROJECTS.flatMap((p) => p.tech)).size.toString(), label: "Technologies" },
       { value: "100%", label: "Live in Production" },
     ],
