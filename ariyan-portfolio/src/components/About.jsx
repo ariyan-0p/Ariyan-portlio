@@ -99,7 +99,7 @@ const TIMELINE = [
     role: "Full-stack Developer",
     company: "Sharkify",
     location: "Hyderabad",
-    date: "Nov 2024 - Mar 2026",
+    date: "July 2024 - Mar 2026",
     desc: "Led full-stack development for AI-driven solutions. Architected scalable web platforms and integrated advanced LLM features.",
     color: "text-purple-400",
     border: "group-hover:border-purple-500/50",

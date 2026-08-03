@@ -85,7 +85,7 @@ export default function Home() {
           {/* RESTORED: Side-by-side buttons on mobile using flex-row */}
           <div className="flex flex-row gap-3 pt-2 w-full md:w-auto">
             <a 
-              href="https://drive.google.com/file/d/1HCPv5xKLeqKqKzcVYqbPBHbWMpvQD321/view?usp=sharing" 
+              href="https://drive.google.com/file/d/12Oae5oa3i8eGR-eXcykriOSmTtQwS9qb/view?usp=sharing"
               target="_blank"
               rel="noopener noreferrer"
               className="flex-1 md:w-auto px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs md:text-base font-bold rounded-full hover:shadow-[0_0_20px_rgba(168,85,247,0.5)] transition transform active:scale-95 flex items-center justify-center gap-2"
