@@ -1,16 +1,32 @@
-# React + Vite
+# Ariyan Samal — Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Editorial-technical portfolio. React 19 + Vite, GSAP/ScrollTrigger, Lenis smooth scroll,
+and a hand-written WebGL ordered-dither portrait shader (no three.js).
 
-Currently, two official plugins are available:
+## Run
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```bash
+npm install
+npm run dev        # http://localhost:5173/Ariyan-portlio/
+npm run build
+npm run deploy     # builds and publishes dist/ to GitHub Pages
+```
 
-## React Compiler
+## Where things live
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- `src/data.js` — **all content**: projects, capabilities, experience log, contact details.
+- `src/components/` — one file per section (`Hero`, `Work`, `Case`, `Capabilities`, `Log`, `Contact`, …).
+- `src/lib/dither.js` — WebGL portrait shader. `src/lib/scroll.js` — Lenis + GSAP wiring.
+- `src/index.css` — the whole design system (tokens at the top).
+- `public/work/*.jpg` — project screenshots (1440×900). Re-capture when a site changes.
 
-## Expanding the ESLint configuration
+## Adding a project
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Add an entry to `PROJECTS` in `src/data.js` and drop `public/work/<slug>.jpg` next to the others.
+
+## Contact form
+
+Submits to Web3Forms (`WEB3FORMS_ACCESS_KEY` in `Contact.jsx`, public by design).
+Brevo automation is wired but off — set `BREVO_ENABLED` and `BREVO_FORM_URL` to enable.
+
+Shortcuts: `⌘/Ctrl + K` or `/` opens the command palette.

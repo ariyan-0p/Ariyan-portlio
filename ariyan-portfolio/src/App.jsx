@@ -1,89 +1,63 @@
-import React, { useState, useEffect, Suspense, lazy } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-
-// Critical UI Components
-import Header from './components/Header';
+import { useCallback, useEffect, useState } from 'react';
+import { startScroll, stopScroll, ScrollTrigger } from './lib/scroll';
 import Loader from './components/Loader';
 import Cursor from './components/Cursor';
-import Dock from './components/Dock';
-
-// Heavy Components (Lazy Loaded)
-const Home = lazy(() => import('./components/Home'));
-const Collaborations = lazy(() => import('./components/Collaborations'));
-const Projects = lazy(() => import('./components/Projects'));
-const About = lazy(() => import('./components/About'));
-const Contact = lazy(() => import('./components/Contact'));
-
-// A professional fallback component
-const PageFallback = () => (
-  <div className="fixed inset-0 bg-black flex flex-col items-center justify-center z-50">
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="flex flex-col items-center gap-4"
-    >
-      {/* Subtle Liquid Glow Bar */}
-      <div className="w-48 h-[2px] bg-white/5 rounded-full overflow-hidden relative">
-        <motion.div 
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-500 to-transparent"
-          animate={{ x: [-200, 200] }}
-          transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-        />
-      </div>
-      <span className="text-[10px] font-mono text-cyan-500/50 tracking-[0.3em] uppercase animate-pulse">
-        Finalizing System
-      </span>
-    </motion.div>
-  </div>
-);
+import Nav from './components/Nav';
+import Palette from './components/Palette';
+import Ruler from './components/Ruler';
+import Hero from './components/Hero';
+import Marquee from './components/Marquee';
+import Manifesto from './components/Manifesto';
+import Work from './components/Work';
+import Capabilities from './components/Capabilities';
+import Log from './components/Log';
+import Contact from './components/Contact';
 
 export default function App() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [ready, setReady] = useState(false);
+  const [palette, setPalette] = useState(false);
+  const [openSlug, setOpenSlug] = useState(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 3500);
-    return () => clearTimeout(timer);
+    startScroll();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => ScrollTrigger.refresh());
+    return stopScroll;
   }, []);
 
+  useEffect(() => {
+    const key = (e) => {
+      const typing = /input|textarea/i.test(e.target.tagName);
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setPalette((p) => !p); }
+      else if (e.key === '/' && !typing) { e.preventDefault(); setPalette(true); }
+    };
+    window.addEventListener('keydown', key);
+    return () => window.removeEventListener('keydown', key);
+  }, []);
+
+  const onDone = useCallback(() => {
+    setReady(true);
+    requestAnimationFrame(() => ScrollTrigger.refresh());
+  }, []);
+  const openFromPalette = useCallback((slug) => setTimeout(() => setOpenSlug(slug), 120), []);
+
   return (
-    <div className="w-full min-h-screen relative font-sans text-white bg-black cursor-none md:cursor-default selection:bg-cyan-500/30 flex flex-col">
-      
-      <AnimatePresence mode="wait">
-        {isLoading ? (
-          <Loader key="loader" />
-        ) : (
-          <>
-            <Cursor />
-            <Header />
+    <>
+      <Loader onDone={onDone} />
+      <Cursor />
+      <div className="grain" aria-hidden="true" />
+      <Nav onPalette={() => setPalette(true)} />
+      <Ruler />
+      <Palette open={palette} onClose={() => setPalette(false)} onOpenProject={openFromPalette} />
 
-            <main className="relative z-10 w-full flex-grow flex flex-col">
-              <Suspense fallback={<PageFallback />}>
-                
-                <div id="home"><Home /></div>
-
-                <div id="collaborations" className="relative z-20 bg-black/40 backdrop-blur-sm border-t border-white/5">
-                  <Collaborations />
-                </div>
-
-                <div id="projects" className="relative z-20 bg-black/20 backdrop-blur-sm">
-                  <Projects />
-                </div>
-
-                <div id="about" className="relative z-20 bg-black">
-                  <About />
-                </div>
-
-                <div id="contact" className="relative z-20 bg-black">
-                  <Contact />
-                </div>
-
-              </Suspense>
-            </main>
-
-            <Dock />
-          </>
-        )}
-      </AnimatePresence>
-    </div>
+      <main>
+        <Hero ready={ready} onPalette={() => setPalette(true)} />
+        <Marquee />
+        <Manifesto />
+        <Work openSlug={openSlug} setOpenSlug={setOpenSlug} />
+        <Capabilities />
+        <Log />
+        <Contact />
+      </main>
+    </>
   );
 }

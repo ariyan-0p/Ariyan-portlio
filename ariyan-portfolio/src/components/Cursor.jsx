@@ -1,48 +1,47 @@
-import { useEffect } from 'react';
-import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { useEffect, useRef } from 'react';
+import { gsap, isTouch } from '../lib/scroll';
 
+// Crosshair cursor. Elements opt in with data-cursor="LABEL".
 export default function Cursor() {
-  // 1. Track mouse position
-  const cursorX = useMotionValue(-100);
-  const cursorY = useMotionValue(-100);
-
-  // 2. Create smooth "Spring" physics (This makes it lag slightly behind the mouse)
-  const springConfig = { damping: 25, stiffness: 700 };
-  const cursorXSpring = useSpring(cursorX, springConfig);
-  const cursorYSpring = useSpring(cursorY, springConfig);
+  const dot = useRef(null);
+  const ring = useRef(null);
+  const label = useRef(null);
 
   useEffect(() => {
-    const moveCursor = (e) => {
-      // Subtract half the width (16px) to center the circle on the mouse
-      cursorX.set(e.clientX - 16);
-      cursorY.set(e.clientY - 16);
-    };
+    if (isTouch()) return undefined;
+    document.documentElement.classList.add('has-cursor');
+    const dx = gsap.quickTo(dot.current, 'x', { duration: 0.08, ease: 'power3' });
+    const dy = gsap.quickTo(dot.current, 'y', { duration: 0.08, ease: 'power3' });
+    const rx = gsap.quickTo(ring.current, 'x', { duration: 0.45, ease: 'power3' });
+    const ry = gsap.quickTo(ring.current, 'y', { duration: 0.45, ease: 'power3' });
 
-    window.addEventListener('mousemove', moveCursor);
-    return () => window.removeEventListener('mousemove', moveCursor);
+    const move = (e) => { dx(e.clientX); dy(e.clientY); rx(e.clientX); ry(e.clientY); };
+    const over = (e) => {
+      const t = e.target.closest && e.target.closest('[data-cursor]');
+      const txt = t ? t.getAttribute('data-cursor') : '';
+      label.current.textContent = txt;
+      ring.current.classList.toggle('is-label', !!txt);
+      ring.current.classList.toggle('is-link', !txt && !!(e.target.closest && e.target.closest('a,button,input,textarea,[role="button"]')));
+    };
+    const down = () => ring.current.classList.add('is-down');
+    const up = () => ring.current.classList.remove('is-down');
+    window.addEventListener('pointermove', move, { passive: true });
+    window.addEventListener('pointerover', over, { passive: true });
+    window.addEventListener('pointerdown', down);
+    window.addEventListener('pointerup', up);
+    return () => {
+      document.documentElement.classList.remove('has-cursor');
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerover', over);
+      window.removeEventListener('pointerdown', down);
+      window.removeEventListener('pointerup', up);
+    };
   }, []);
 
   return (
     <>
-      {/* THE GLOWING RING */}
-      <motion.div
-        className="fixed top-0 left-0 w-8 h-8 border-2 border-cyan-400 rounded-full pointer-events-none z-[9999] hidden md:block shadow-[0_0_15px_rgba(34,211,238,0.5)]"
-        style={{
-          x: cursorXSpring,
-          y: cursorYSpring,
-        }}
-      />
-      
-      {/* OPTIONAL: A TINY DOT IN THE CENTER (Follows instantly) */}
-      <motion.div 
-        className="fixed top-0 left-0 w-2 h-2 bg-white rounded-full pointer-events-none z-[9999] hidden md:block mix-blend-difference"
-        style={{
-            x: cursorX, // No spring, follows instantly
-            y: cursorY,
-            translateX: 12, // Offset to center inside the 32px ring
-            translateY: 12
-        }}
-      />
+      <div ref={ring} className="cursor-ring"><span ref={label} /></div>
+      <div ref={dot} className="cursor-dot" />
     </>
   );
 }
