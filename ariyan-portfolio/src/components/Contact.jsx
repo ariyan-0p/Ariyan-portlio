@@ -91,7 +91,7 @@ export default function Contact() {
 
   return (
     <section id="contact" ref={root} className="ct">
-      <div className="mf__idx"><span>(04)</span><span>Contact</span></div>
+      <div className="mf__idx"><span>(05)</span><span>Contact</span></div>
       <h2 className="ct__big" aria-label="Let’s build">
         <span className="line">{split('LET’S')}</span>
         <span className="line line--r">{split('BUILD')}<em className="ct__dot">.</em></span>

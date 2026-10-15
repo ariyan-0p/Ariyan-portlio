@@ -7,6 +7,7 @@ import Palette from './components/Palette';
 import Ruler from './components/Ruler';
 import Hero from './components/Hero';
 import Marquee from './components/Marquee';
+import Process from './components/Process';
 import Manifesto from './components/Manifesto';
 import Work from './components/Work';
 import Log from './components/Log';
@@ -51,6 +52,7 @@ export default function App() {
       <main>
         <Hero ready={ready} onPalette={() => setPalette(true)} />
         <Marquee />
+        <Process />
         <Manifesto />
         <Work openSlug={openSlug} setOpenSlug={setOpenSlug} />
         <Log />

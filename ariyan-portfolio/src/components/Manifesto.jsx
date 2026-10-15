@@ -118,7 +118,7 @@ export default function Manifesto() {
       <div ref={pin} className="mf__pin">
         <div className="mf__stage">
           <div className="mf__left">
-            <div className="mf__idx"><span>(01)</span><span>The whole product</span></div>
+            <div className="mf__idx"><span>(02)</span><span>The whole product</span></div>
             <h2 className="mf__h">I don’t fit in a niche. I build <em>the whole product.</em></h2>
             <ol className="mf__layers">
               {CAPABILITIES.map((c, i) => (

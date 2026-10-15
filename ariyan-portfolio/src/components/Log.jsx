@@ -35,7 +35,7 @@ export default function Log() {
   return (
     <section id="log" ref={root} className="log">
       <div className="log__head">
-        <div className="mf__idx"><span>(03)</span><span>Experience</span></div>
+        <div className="mf__idx"><span>(04)</span><span>Experience</span></div>
         <h2 className="wk__title" aria-label="Git log">
           <span className="line">{split('GIT')}</span>
           <span className="line line--r">{split('LOG')}</span>
