@@ -133,7 +133,7 @@ export function createGallery(canvas, items, { onActive, onHover, onOpen, mobile
   // ── state ──
   const st = {
     progress: 0, z: DIST, x: 0, y: 0, vel: 0, active: -1, dead: false, raf: 0, visible: true, last: 0,
-    mx: 0, my: 0, mxs: 0, mys: 0, hovered: -1, w: 1, h: 1,
+    mx: 0, my: 0, mxs: 0, mys: 0, hovered: -1, w: 1, h: 1, dist: DIST, xf: 0.55, init: false,
   };
   const ray = new THREE.Raycaster();
   const ndc = new THREE.Vector2();
@@ -148,6 +148,11 @@ export function createGallery(canvas, items, { onActive, onHover, onOpen, mobile
     // keep the plane comfortably framed on tall (mobile) viewports
     camera.fov = w / h < 1 ? 70 : 50;
     camera.updateProjectionMatrix();
+    // portrait screens: pull back so a whole plane fits, and stop sliding it off-centre
+    const asp = w / h;
+    st.dist = asp < 1 ? Math.min(15, W / 0.86 / (2 * Math.tan(THREE.MathUtils.degToRad(35)) * asp)) : DIST;
+    st.xf = asp < 1 ? 1 : 0.55;
+    if (!st.init) { st.z = st.dist; st.init = true; }
   };
   resize();
   const ro = new ResizeObserver(resize);
@@ -212,8 +217,8 @@ export function createGallery(canvas, items, { onActive, onHover, onOpen, mobile
     const g = N === 1 ? 0 : base + e;
     const a = planes[base].group.position;
     const b = planes[Math.min(base + 1, N - 1)].group.position;
-    const tz = -g * GAP + DIST;
-    const tx = (a.x + (b.x - a.x) * e) * 0.55;
+    const tz = -g * GAP + st.dist;
+    const tx = (a.x + (b.x - a.x) * e) * st.xf;
     const ty = (a.y + (b.y - a.y) * e) * 0.7;
 
     const prevZ = st.z;
@@ -239,12 +244,11 @@ export function createGallery(canvas, items, { onActive, onHover, onOpen, mobile
       u.uHover.value = p.hover;
       u.uMouse.value.lerp(p.mouse, k(14));
       const depth = camera.position.z - p.group.position.z;
-      p.frame.material.opacity = clamp(1 - Math.abs(depth - DIST) / 34, 0, 0.6) * (depth < 1.5 ? 0 : 1);
+      p.frame.material.opacity = clamp(1 - Math.abs(depth - st.dist) / 34, 0, 0.6) * (depth < 1.5 ? 0 : 1);
       // gentle float
       p.group.position.y = Math.cos(i * 1.3) * 1.1 + Math.sin(t * 0.6 + i) * 0.08;
     });
 
-    dust.position.z = (st.z - DIST) * 0.0; // static field; the camera does the travel
     dust.material.size = 0.07 + Math.abs(st.vel) * 0.06;
     renderer.render(scene, camera);
     st.raf = requestAnimationFrame(frame);

@@ -9,7 +9,7 @@ export default function Work({ openSlug, setOpenSlug }) {
   const root = useRef(null);
   const preview = useRef(null);
   const [filter, setFilter] = useState('All');
-  const [mode, setMode] = useState(() => (isTouch() && window.innerWidth < 600) || reduceMotion() ? 'list' : 'fly');
+  const [mode, setMode] = useState(() => (reduceMotion() ? 'list' : 'fly'));
   const [hover, setHover] = useState(null);
   const touch = useMemo(() => isTouch(), []);
 
@@ -69,7 +69,7 @@ export default function Work({ openSlug, setOpenSlug }) {
   return (
     <section id="work" ref={root} className={`wk ${mode === 'fly' ? 'has-gal' : ''}`}>
       <div className="wk__head">
-        <div className="mf__idx"><span>(01)</span><span>Selected work</span></div>
+        <div className="mf__idx"><span>(02)</span><span>Selected work</span></div>
         <h2 className="wk__title" aria-label="Work">
           <span className="line">{split('SELECTED')}</span>
           <span className="line line--r">{split('WORK')}<sup>{String(PROJECTS.length).padStart(2, '0')}</sup></span>

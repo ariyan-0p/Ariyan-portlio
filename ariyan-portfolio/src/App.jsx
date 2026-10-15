@@ -9,7 +9,6 @@ import Hero from './components/Hero';
 import Marquee from './components/Marquee';
 import Manifesto from './components/Manifesto';
 import Work from './components/Work';
-import Capabilities from './components/Capabilities';
 import Log from './components/Log';
 import Contact from './components/Contact';
 
@@ -54,7 +53,6 @@ export default function App() {
         <Marquee />
         <Manifesto />
         <Work openSlug={openSlug} setOpenSlug={setOpenSlug} />
-        <Capabilities />
         <Log />
         <Contact />
       </main>

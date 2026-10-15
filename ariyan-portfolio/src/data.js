@@ -134,8 +134,8 @@ export const STACK = ['React', 'Next.js', 'Node.js', 'Flutter', 'Go', 'Python', 
 
 export const SECTIONS = [
   { id: 'top', label: 'Index' },
-  { id: 'work', label: 'Work' },
   { id: 'capabilities', label: 'Capabilities' },
+  { id: 'work', label: 'Work' },
   { id: 'log', label: 'Log' },
   { id: 'contact', label: 'Contact' },
 ];
