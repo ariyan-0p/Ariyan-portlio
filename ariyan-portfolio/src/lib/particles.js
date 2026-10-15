@@ -303,6 +303,7 @@ export async function createHeroParticles(canvas, { photo, mobile, onStage }) {
     from: 3, to: 0, morph: 1, dur: 2.6, started: false, stage: -1, dead: false, raf: 0, visible: true, last: 0,
     mx: 0, my: 0, mxs: 0, mys: 0, shock: -1, disperse: 0, timer: 0, hold: 0, auto: true, pauseUntil: 0,
     px: 99, py: 99,
+    gov: { sum: 0, n: 0, level: 0 },
   };
   const HOLD = [2.5, 6.4, 4.2];
 
@@ -363,6 +364,20 @@ export async function createHeroParticles(canvas, { photo, mobile, onStage }) {
     if (S.dead || !S.visible) return;
     const dt = Math.min((now - (S.last || now)) / 1000, 0.1);
     S.last = now;
+    // quality governor: if the average frame is slow, shed work in two steps instead of stuttering
+    if (S.started && dt > 0) {
+      const g = S.gov;
+      g.sum += dt; g.n += 1;
+      if (g.n >= 45) {
+        const avg = g.sum / g.n;
+        g.sum = 0; g.n = 0;
+        if (avg > 0.03 && g.level < 2) {
+          g.level += 1;
+          if (g.level === 1) { renderer.setPixelRatio(1); mat.uniforms.uPixel.value = 1; resize(); }
+          else geo.setDrawRange(0, Math.floor(N * 0.45));
+        }
+      }
+    }
     const u = mat.uniforms;
     u.uTime.value = (now - t0) / 1000;
 

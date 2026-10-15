@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap, ScrollTrigger, goTo, isTouch, reduceMotion } from '../lib/scroll';
-import { createHeroParticles } from '../lib/particles';
 import { PROFILE, PROJECTS } from '../data';
 
 const STAGES = [
@@ -20,7 +19,7 @@ export default function Hero({ warm, ready, onPalette, onCloud }) {
   useEffect(() => {
     if (!warm) return undefined;
     let dead = false;
-    createHeroParticles(canvas.current, { photo: PROFILE.photo, mobile: isTouch(), onStage: setStage }).then((p) => {
+    import('../lib/particles').then((m) => m.createHeroParticles(canvas.current, { photo: PROFILE.photo, mobile: isTouch(), onStage: setStage })).then((p) => {
       if (dead) { p && p.destroy(); return; }
       if (!p) { setFallback(true); return; }
       api.current = p;

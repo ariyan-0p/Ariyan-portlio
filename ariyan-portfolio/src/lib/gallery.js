@@ -134,6 +134,7 @@ export function createGallery(canvas, items, { onActive, onHover, onOpen, mobile
   const st = {
     progress: 0, z: DIST, x: 0, y: 0, vel: 0, active: -1, dead: false, raf: 0, visible: true, last: 0,
     mx: 0, my: 0, mxs: 0, mys: 0, hovered: -1, w: 1, h: 1, dist: DIST, xf: 0.55, init: false,
+    gov: { sum: 0, n: 0, level: 0 },
   };
   const ray = new THREE.Raycaster();
   const ndc = new THREE.Vector2();
@@ -208,6 +209,19 @@ export function createGallery(canvas, items, { onActive, onHover, onOpen, mobile
     st.last = now;
     const k = (r) => 1 - Math.exp(-r * dt);
     const t = (now - t0) / 1000;
+    if (dt > 0) {
+      const g = st.gov;
+      g.sum += dt; g.n += 1;
+      if (g.n >= 45) {
+        const avg = g.sum / g.n;
+        g.sum = 0; g.n = 0;
+        if (avg > 0.03 && g.level < 2) {
+          g.level += 1;
+          if (g.level === 1) { renderer.setPixelRatio(1); resize(); }
+          else dustGeo.setDrawRange(0, Math.floor(COUNT * 0.4));
+        }
+      }
+    }
 
     // progress → fractional index with a dwell on every plane
     const f = clamp(st.progress, 0, 1) * (N - 1);
