@@ -308,7 +308,7 @@ export async function createHeroParticles(canvas, { photo, mobile, onStage }) {
     mx: 0, my: 0, mxs: 0, mys: 0, shock: -1, disperse: 0, timer: 0, hold: 0, auto: true, pauseUntil: 0,
     px: 99, py: 99,
   };
-  const HOLD = [4.6, 6.4, 4.2];
+  const HOLD = [2.5, 6.4, 4.2];
 
   const goTo = (i, manual) => {
     if (i === S.stage && S.morph >= 1) return;
