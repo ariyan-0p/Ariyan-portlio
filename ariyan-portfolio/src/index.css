@@ -261,6 +261,41 @@ html.invert .wk__row { border-color: rgba(12, 12, 11, 0.2); }
 .wk__imgs img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; opacity: 0; clip-path: inset(0 0 100% 0); transition: opacity 0.4s, clip-path 0.6s var(--ease); }
 .wk__imgs img.is-on { opacity: 1; clip-path: inset(0); }
 
+/* ───────────────────────── Fly-through gallery ───────────────────────── */
+.wk__bar2 { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-top: clamp(1.8rem, 3vw, 3rem); }
+.wk__bar2 .wk__filters { margin-top: 0; }
+.wk__mode { display: inline-flex; border: 1px solid rgba(236, 232, 224, 0.3); border-radius: 999px; padding: 3px; }
+.wk__mode button { padding: 0.6rem 1rem; border-radius: 999px; font: 500 0.7rem/1 var(--mono); text-transform: uppercase; letter-spacing: 0.08em; transition: background 0.3s, color 0.3s; }
+.wk__mode button.is-on { background: var(--sig); color: var(--ink); }
+.wk.has-gal { padding-bottom: 0; }
+.gal { position: relative; margin: 0 calc(var(--pad) * -1); }
+.gal__stage { position: sticky; top: 0; height: 100svh; overflow: hidden; background: var(--ink); color: var(--bone); }
+.gal__canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: pan-y; }
+.gal__hud { position: absolute; inset: 0; pointer-events: none; padding: 5.2rem var(--pad) var(--pad); display: flex; flex-direction: column; justify-content: space-between; }
+.gal__hud button { pointer-events: auto; }
+.gal__top { display: flex; justify-content: space-between; font: 400 0.68rem var(--mono); text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.75; }
+.gal__count b { color: var(--sig); font-weight: 500; }
+.gal__ticks { position: absolute; right: var(--pad); top: 50%; transform: translateY(-50%); display: grid; gap: 0.15rem; justify-items: end; }
+.gal__ticks button { display: flex; align-items: center; gap: 0.6rem; padding: 0.2rem 0; font: 400 0.62rem var(--mono); letter-spacing: 0.08em; opacity: 0.45; transition: opacity 0.3s; }
+.gal__ticks button i { width: 10px; height: 1px; background: currentColor; transition: width 0.5s var(--ease), background 0.3s; }
+.gal__ticks button span { opacity: 0; transform: translateX(6px); transition: opacity 0.3s, transform 0.4s var(--ease); }
+.gal__ticks button:hover, .gal__ticks button.is-on { opacity: 1; }
+.gal__ticks button:hover span, .gal__ticks button.is-on span { opacity: 1; transform: none; }
+.gal__ticks button.is-on i { width: 34px; background: var(--sig); }
+.gal__info { display: grid; gap: 1rem; max-width: 92vw; text-shadow: 0 2px 30px rgba(12, 12, 11, 0.85); }
+.gal__cat { display: flex; align-items: center; gap: 0.7rem; font: 500 0.72rem var(--mono); text-transform: uppercase; letter-spacing: 0.08em; animation: galIn 0.8s var(--ease) both; }
+.gal__cat i { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+.gal__title { overflow: hidden; font: 800 clamp(2.6rem, 7.6vw, 8.4rem)/0.9 var(--display); letter-spacing: -0.06em; text-transform: uppercase; padding-bottom: 0.06em; }
+.gal__title span { display: block; animation: galUp 1s var(--ease) both; }
+.gal__row { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.6rem; animation: galIn 0.9s var(--ease) 0.1s both; }
+.gal__tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.gal__tags span { padding: 0.4rem 0.75rem; border: 1px solid rgba(236, 232, 224, 0.4); border-radius: 999px; font: 400 0.66rem var(--mono); text-transform: uppercase; letter-spacing: 0.05em; background: rgba(12, 12, 11, 0.5); }
+.gal .btn { --fg: var(--bone); --bg: var(--ink); }
+.gal__loading { height: 60vh; display: grid; place-items: center; font: 400 0.75rem var(--mono); text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.6; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@keyframes galUp { from { transform: translateY(105%); } }
+@keyframes galIn { from { opacity: 0; transform: translateY(14px); } }
+
 /* ───────────────────────── Case overlay ───────────────────────── */
 .case { position: fixed; inset: 0; z-index: 140; background: var(--bone); color: var(--ink); overflow-y: auto; overscroll-behavior: contain; }
 html.invert .case { background: var(--ink); color: var(--bone); }
@@ -415,6 +450,9 @@ html.invert .case__meta, html.invert .case__nav { --line: rgba(236, 232, 224, 0.
   .wk__cat { grid-area: cat; }
   .wk__yr { grid-area: yr; }
   .wk__thumb { display: block; grid-area: thumb; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; border-radius: 8px; }
+  .gal__ticks { display: none; }
+  .gal__hud { padding-top: 4.6rem; }
+  .gal__top span:first-child { max-width: 11rem; }
   .case__body { grid-template-columns: 1fr; }
   .case__info { position: static; }
   .cap__inner { grid-template-columns: 1fr; min-height: 0; }
