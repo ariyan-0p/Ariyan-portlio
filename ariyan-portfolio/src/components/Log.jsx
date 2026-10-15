@@ -1,81 +1,130 @@
-import { useEffect, useRef } from 'react';
-import { gsap } from '../lib/scroll';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { ScrollTrigger, getLenis } from '../lib/scroll';
 import { LOG } from '../data';
 
-// Experience rendered as `git log --graph`, beside a sticky summary panel.
-export default function Log() {
-  const root = useRef(null);
+// Experience as a pinned `git log --graph` + a live `git show <hash>` terminal.
+// Scrolling steps through the commits; the terminal types each one out as a diff.
 
-  const work = LOG.filter((e) => e.kind === 'work');
-  const now = LOG.find((e) => e.head);
+const N = LOG.length;
+
+function buildLines(e) {
+  const sentences = e.msg.split(/(?<=\.)\s+/).filter(Boolean);
+  const lines = [
+    { c: 'c-commit', t: `commit ${e.hash}${e.head ? ' (HEAD -> main, origin/main)' : ''}` },
+    { c: 'c-dim', t: 'Author: Ariyan Samal' },
+    { c: 'c-dim', t: `Date:   ${e.date}` },
+    { c: '', t: '' },
+    { c: 'c-role', t: `    ${e.role}` },
+    { c: 'c-org', t: `    ${e.org} — ${e.place}` },
+    { c: '', t: '' },
+    ...sentences.map((s) => ({ c: 'c-add', t: `  + ${s}` })),
+    { c: '', t: '' },
+    { c: 'c-dim', t: e.kind === 'edu' ? '  tag: education' : '  tag: work' },
+  ];
+  return lines;
+}
+
+export default function Log() {
+  const pin = useRef(null);
+  const [active, setActive] = useState(0);
+  const [typed, setTyped] = useState({ for: -1, n: 0 });
+
+  const work = LOG.filter((e) => e.kind === 'work').length;
   const years = new Date().getFullYear() - 2023;
+  const e = LOG[active];
+  const lines = useMemo(() => buildLines(e), [e]);
+  const total = useMemo(() => lines.reduce((n, l) => n + l.t.length + 1, 0), [lines]);
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo('.log__rail i', { scaleY: 0 }, {
-        scaleY: 1, ease: 'none', transformOrigin: 'top',
-        scrollTrigger: { trigger: '.log__list', start: 'top 70%', end: 'bottom 70%', scrub: true },
-      });
-      gsap.utils.toArray('.log__item').forEach((el) => {
-        gsap.from(el.querySelectorAll('.log__rev'), {
-          y: 44, opacity: 0, duration: 1, stagger: 0.08, ease: 'expo.out',
-          scrollTrigger: { trigger: el, start: 'top 86%' },
-        });
-        gsap.fromTo(el.querySelector('.log__node'), { scale: 0 }, {
-          scale: 1, duration: 0.6, ease: 'back.out(2.4)',
-          scrollTrigger: { trigger: el, start: 'top 80%' },
-        });
-      });
-      gsap.from('.log__side > *', {
-        y: 36, opacity: 0, duration: 1, stagger: 0.09, ease: 'expo.out',
-        scrollTrigger: { trigger: '.log__side', start: 'top 82%' },
-      });
-    }, root);
-    return () => ctx.revert();
+    const st = ScrollTrigger.create({
+      trigger: pin.current, start: 'top top', end: 'bottom bottom',
+      onUpdate: (self) => setActive(Math.min(N - 1, Math.floor(self.progress * N * 0.999))),
+    });
+    return () => st.kill();
   }, []);
 
-  return (
-    <section id="log" ref={root} className="log">
-      <div className="log__wrap">
-        <aside className="log__side">
-          <div className="mf__idx"><span>(04)</span><span>Experience</span></div>
-          <h2 className="log__h">Where I’ve been <em>building</em> — and what I shipped there.</h2>
-          <p className="log__cmd"><b>$</b> git log --graph --oneline --career</p>
+  // typewriter: restarts whenever the active commit changes
+  useEffect(() => {
+    let n = 0;
+    const id = setInterval(() => {
+      n += 7;
+      setTyped({ for: active, n });
+      if (n >= total) clearInterval(id);
+    }, 14);
+    return () => clearInterval(id);
+  }, [active, total]);
+  const shown = typed.for === active ? typed.n : 0; // a new commit starts from nothing
 
-          <div className="log__stats">
-            <div><b>{years}+</b><span>years building</span></div>
-            <div><b>{String(work.length).padStart(2, '0')}</b><span>engineering roles</span></div>
-            <div><b>{LOG.filter((e) => e.kind === 'edu').length}</b><span>degrees &amp; diplomas</span></div>
+  const jump = (i) => {
+    const el = pin.current;
+    const range = el.offsetHeight - window.innerHeight;
+    const y = el.getBoundingClientRect().top + window.scrollY + ((i + 0.5) / N) * range;
+    const l = getLenis();
+    if (l) l.scrollTo(y, { duration: 1.3 });
+    else window.scrollTo({ top: y, behavior: 'smooth' });
+  };
+
+  // reveal `shown` characters across the lines
+  const starts = lines.reduce((acc, l, i) => { acc.push(i === 0 ? 0 : acc[i - 1] + lines[i - 1].t.length + 1); return acc; }, []);
+  const rendered = lines.map((l, i) => {
+    const take = Math.max(0, Math.min(l.t.length, shown - starts[i]));
+    const done = shown - starts[i] > l.t.length;
+    return (
+      <div key={i} className={`lg__ln ${l.c}`}>
+        {l.t.slice(0, take) || ' '}
+        {!done && take > 0 && <i className="lg__caret" />}
+      </div>
+    );
+  });
+  const finished = shown >= total;
+
+  return (
+    <section id="log" className="lg">
+      <div ref={pin} className="lg__pin" style={{ height: `${N * 80 + 100}vh` }}>
+        <div className="lg__stage">
+          <div className="lg__left">
+            <div className="mf__idx"><span>(04)</span><span>Experience</span></div>
+            <h2 className="lg__h">Where I’ve been <em>building.</em></h2>
+            <div className="lg__meta">
+              <span><b>{years}+</b> yrs</span><span><b>{String(work).padStart(2, '0')}</b> roles</span><span><b>{N}</b> commits</span>
+            </div>
+
+            <ol className="lg__graph" aria-label="Career commit graph">
+              {LOG.map((c, i) => (
+                <li key={c.hash} className={`lg__row ${c.kind === 'edu' ? 'is-edu' : 'is-work'} ${i === active ? 'is-on' : ''} ${i < active ? 'is-past' : ''} ${i === work - 1 ? 'is-fork' : ''} ${i === 0 ? 'is-first' : ''}`}>
+                  <button onClick={() => jump(i)} data-cursor="CHECKOUT">
+                    <span className="lg__lane"><i className="lg__node" /></span>
+                    <span className="lg__lbl">
+                      <code>{c.hash}</code>
+                      <b>{c.role}</b>
+                      <em>{c.org}</em>
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ol>
           </div>
 
-          {now && (
-            <div className="log__now">
-              <span className="log__now-k"><i className="dot" />Currently</span>
-              <b>{now.role}</b>
-              <span>{now.org} — {now.place}</span>
+          <div className="lg__right">
+            <div className="lg__term">
+              <div className="lg__bar"><i /><i /><i /><span>git show {e.hash}</span><em>{active + 1}/{N}</em></div>
+              <div className="lg__body" aria-live="polite">
+                <div className="lg__prompt"><b>$</b> git show {e.hash}</div>
+                {rendered}
+                {finished && <div className="lg__ln"><span className="c-prompt">$</span> <i className="lg__caret" /></div>}
+              </div>
+              <div className="lg__oneline">
+                <div className="lg__ohead">$ git log --oneline</div>
+                {LOG.map((c, i) => (
+                  <button key={c.hash} className={i === active ? 'is-on' : ''} onClick={() => jump(i)} data-cursor="CHECKOUT">
+                    <code>{c.hash}</code>
+                    <span>{c.head && <u>HEAD</u>}{c.role}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-          )}
-        </aside>
-
-        <ol className="log__list">
-          <div className="log__rail" aria-hidden="true"><i /></div>
-          {LOG.map((e) => (
-            <li className={`log__item ${e.kind === 'edu' ? 'is-edu' : ''}`} key={e.hash}>
-              <div className="log__node" aria-hidden="true" />
-              <div className="log__hash log__rev">
-                <code>{e.hash}</code>
-                {e.head && <span className="log__ref">HEAD → main</span>}
-                {e.kind === 'edu' && <span className="log__ref is-tag">tag: education</span>}
-              </div>
-              <div className="log__card log__rev">
-                <div className="log__date">{e.date}</div>
-                <h3>{e.role}</h3>
-                <div className="log__org">{e.org} <span>— {e.place}</span></div>
-                <p>{e.msg}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
+          </div>
+        </div>
       </div>
     </section>
   );
