@@ -1,149 +1,249 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { gsap, reduceMotion } from '../lib/scroll';
 import { PROFILE, PROJECTS } from '../data';
 
-const LINES = [
-  ['ariyan.sys', 'v3.0 — booting'],
-  ['mount /work', `${PROJECTS.length} products found`],
-  ['link  /stack', 'react · node · flutter · ai'],
-  ['compile', 'shaders · particles · type'],
-];
-const RING = 'ARIYAN SAMAL ✦ FULL-STACK ENGINEER ✦ HYDERABAD ✦ AVAILABLE ✦ ';
+// A fake "hack-in" terminal that is secretly doing real work: it preloads the fonts, the portrait
+// and every project screenshot, and reads the visitor's viewport / cores / timezone locally.
 
-// Preloads the real assets (fonts, portrait, every project screenshot) and reports 0..1.
-function trackAssets(onProgress) {
-  const urls = [PROFILE.photo, ...PROJECTS.map((p) => p.shot)];
-  const total = urls.length + 1;
-  let done = 0;
-  const tick = () => { done += 1; onProgress(done / total); };
-  urls.forEach((u) => {
-    const img = new Image();
-    img.onload = tick;
-    img.onerror = tick;
-    img.src = u;
-  });
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(tick, tick); else tick();
+const boxed = (rows) => {
+  const w = Math.max(...rows.map((r) => [...r].length)) + 6;
+  const pad = (r) => { const n = w - [...r].length; const l = Math.floor(n / 2); return '║' + ' '.repeat(l) + r + ' '.repeat(n - l) + '║'; };
+  return ['╔' + '═'.repeat(w) + '╗', ...rows.map(pad), '╚' + '═'.repeat(w) + '╝'].join('\n');
+};
+const BANNER = boxed(['A R I Y A N   S A M A L', 'full-stack engineer · interface → infra', 'portfolio v3.0 · 2026']);
+
+const ASSETS = [
+  ['ariyan.jpg', PROFILE.photo],
+  ...PROJECTS.map((p) => [`${p.slug}.jpg`, p.shot]),
+];
+
+const HEX = '0123456789abcdef';
+const hexByte = () => HEX[(Math.random() * 16) | 0] + HEX[(Math.random() * 16) | 0];
+const WORDS = ['ariyan', 'react ', 'three ', 'gsap  ', 'node  ', 'flutter', 'webgl ', 'shader', 'build ', 'ship  '];
+
+function hexLine(n) {
+  const addr = (n * 16).toString(16).padStart(6, '0');
+  const bytes = Array.from({ length: 12 }, hexByte);
+  const ascii = Array.from({ length: 12 }, () => (Math.random() < 0.18 ? WORDS[(Math.random() * WORDS.length) | 0][0] : '.')).join('');
+  return `<b>0x${addr}</b>  ${bytes.join(' ')}  <i>|${ascii}|</i>`;
 }
 
-export default function Loader({ onReveal, onDone }) {
+export default function Loader({ onWarm, cloudReady, onReveal, onDone }) {
   const root = useRef(null);
-  const count = useRef(null);
-  const bar = useRef(null);
-
-  // square tiles that cover the screen; ~11% are orange so the reveal sparkles
-  const grid = useMemo(() => {
-    const cols = window.innerWidth < 700 ? 9 : 16;
-    const size = window.innerWidth / cols;
-    const rows = Math.ceil(window.innerHeight / size) + 1;
-    const tiles = Array.from({ length: cols * rows }, (_, i) => ({ i, hot: (i * 7919) % 97 < 11 }));
-    return { cols, rows, size, tiles };
-  }, []);
+  const crt = useRef(null);
+  const main = useRef(null);
+  const hex = useRef(null);
+  const files = useRef(null);
+  const meter = useRef(null);
+  const grant = useRef(null);
 
   useEffect(() => {
-    const fast = reduceMotion();
-    const MIN = fast ? 0.3 : 2.4;
-    let assets = 0;
-    trackAssets((p) => { assets = p; });
-    const failsafe = setTimeout(() => { assets = 1; }, 7000);
+    const fast = reduceMotion() || sessionStorage.getItem('as_seen') === '1';
+    let dead = false;
+    const timers = new Set();
+    const sleep = (ms) => new Promise((res) => {
+      const t = setTimeout(() => { timers.delete(t); res(); }, fast ? ms * 0.22 : ms);
+      timers.add(t);
+    });
 
-    const ctx = gsap.context(() => {
-      const q = gsap.utils.selector(root.current);
-      const tl0 = gsap.timeline();
-      tl0.from(q('.boot__ring'), { scale: 0.55, opacity: 0, duration: 1.4, ease: 'expo.out' }, 0);
-      tl0.from(q('.boot__tick'), { opacity: 0, scale: 0.9, duration: 1.2, ease: 'expo.out' }, 0.1);
-      tl0.fromTo(q('.boot__mono path'), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.5, stagger: 0.25, ease: 'power2.inOut' }, 0.2);
-      tl0.from(q('.boot__row'), { opacity: 0, x: -14, duration: 0.5, stagger: 0.38 }, 0.25);
-      tl0.from(q('.boot__meta'), { opacity: 0, y: 14, duration: 0.8 }, 0.6);
-      const spin = gsap.to(q('.boot__ringtext'), { rotation: 360, svgOrigin: '210 210', duration: 16, ease: 'none', repeat: -1 });
-      gsap.to(q('.boot__tick'), { rotation: -360, transformOrigin: '50% 50%', duration: 40, ease: 'none', repeat: -1 });
+    const M = main.current;
+    const Hx = hex.current;
+    const F = files.current;
+    M.innerHTML = ''; Hx.innerHTML = ''; F.innerHTML = '';
 
-      const st = { shown: 0, t: 0, exiting: false };
-      const el = count.current;
-      const tickFn = (_, dt) => {
-        if (st.exiting) return;
-        st.t += dt / 1000;
-        const target = Math.min(assets, Math.min(1, st.t / MIN)) * 100;
-        st.shown += (target - st.shown) * Math.min(1, dt / 120);
-        const n = Math.min(100, Math.round(st.shown));
-        el.textContent = String(n).padStart(3, '0');
-        bar.current.style.transform = `scaleX(${n / 100})`;
-        // glitchy RGB split on the counter
-        if (Math.random() < 0.16) {
-          const a = (Math.random() - 0.5) * 14;
-          el.style.textShadow = `${a}px 0 var(--sig), ${-a}px 0 #4ee`;
-        } else if (Math.random() < 0.3) el.style.textShadow = 'none';
-        if (n >= 100 && st.t >= MIN) { st.exiting = true; exit(); }
-      };
+    // ── asset loading (real) ──
+    const prog = { done: 0, total: ASSETS.length + 1 };
+    const fileEls = ASSETS.map(([name]) => {
+      const row = document.createElement('div');
+      row.innerHTML = `<span class="t-dim">${name.padEnd(16, '.')}</span> <span class="t-wait">decrypting</span>`;
+      F.appendChild(row);
+      return row;
+    });
+    const mark = (i) => {
+      prog.done += 1;
+      if (i != null && fileEls[i]) fileEls[i].lastElementChild.outerHTML = '<span class="t-ok">✓ ok</span>';
+    };
+    ASSETS.forEach(([, url], i) => {
+      const img = new Image();
+      img.onload = () => mark(i);
+      img.onerror = () => mark(i);
+      img.src = url;
+    });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => mark(null), () => mark(null)); else mark(null);
+    const failsafe = setTimeout(() => { prog.done = prog.total; }, 8000);
+    const assetFrac = () => Math.min(1, prog.done / prog.total);
 
-      function exit() {
-        gsap.ticker.remove(tickFn);
-        el.textContent = '100';
-        el.style.textShadow = 'none';
-        const tl = gsap.timeline({ onComplete: () => { root.current.style.display = 'none'; onDone && onDone(); } });
-        spin.timeScale(6);
-        tl.to(q('.boot__log, .boot__meta, .boot__count'), { opacity: 0, y: 20, duration: 0.4, ease: 'power2.in' }, 0);
-        tl.to(q('.boot__ring'), { scale: 1.9, opacity: 0, duration: 0.9, ease: 'expo.in' }, 0);
-        tl.to(q('.boot__tick'), { scale: 2.4, opacity: 0, duration: 0.9, ease: 'expo.in' }, 0);
-        // dive through the monogram
-        tl.to(q('.boot__mono'), { scale: 26, duration: 0.95, ease: 'expo.in', transformOrigin: '50% 50%' }, 0.1);
-        tl.to(q('.boot__mono'), { opacity: 0, duration: 0.25 }, 0.95);
-        // tiles collapse from the centre, hero is revealed underneath
-        tl.to(q('.boot__tile.is-hot'), { backgroundColor: '#ff4d1f', duration: 0.25, stagger: { amount: 0.5, from: 'center' } }, 0.6);
-        tl.add(() => onReveal && onReveal(), 0.95);
-        tl.to(q('.boot__tile'), {
-          scale: 0, duration: 0.8, ease: 'power3.inOut',
-          stagger: { amount: 0.85, from: 'center', grid: [grid.rows, grid.cols] },
-        }, 0.95);
+    // ── side panes ──
+    let hexN = 0;
+    const hexTimer = setInterval(() => {
+      const d = document.createElement('div');
+      d.innerHTML = hexLine(hexN++);
+      Hx.appendChild(d);
+      while (Hx.children.length > 22) Hx.removeChild(Hx.firstChild);
+      meter.current.style.transform = `scaleX(${Math.max(assetFrac(), 0.04)})`;
+    }, fast ? 20 : 70);
+
+    // ── terminal primitives ──
+    const caret = document.createElement('span');
+    caret.className = 't-caret';
+    const add = (html, cls = '') => {
+      const d = document.createElement('div');
+      d.className = `t-line ${cls}`;
+      d.innerHTML = html;
+      M.appendChild(d);
+      while (M.children.length > 40) M.removeChild(M.firstChild);
+      return d;
+    };
+    const type = async (text) => {
+      const d = add('<span class="t-prompt">visitor@ariyan</span><span class="t-dim">:</span><span class="t-path">~</span><span class="t-dim">$</span> <span class="t-typed"></span>');
+      const span = d.querySelector('.t-typed');
+      d.appendChild(caret);
+      for (const ch of text) {
+        if (dead) return;
+        span.textContent += ch;
+        await sleep(9 + Math.random() * 16);
       }
-      gsap.ticker.add(tickFn);
-      return () => { gsap.ticker.remove(tickFn); };
-    }, root);
-    return () => { clearTimeout(failsafe); ctx.revert(); };
-  }, [grid, onReveal, onDone]);
+      await sleep(150);
+      caret.remove();
+    };
+    const ok = (s) => add(`<span class="t-ok">[ OK ]</span> ${s}`);
+
+    const scramble = (el, final, ms) => new Promise((res) => {
+      const chars = '█▓▒░<>/\\|{}[]#$%&*+=?!01';
+      const t0 = performance.now();
+      const step = () => {
+        if (dead) { res(); return; }
+        const p = Math.min(1, (performance.now() - t0) / ms);
+        el.textContent = [...final].map((c, i) => (c === ' ' || i < p * final.length ? c : chars[(Math.random() * chars.length) | 0])).join('');
+        if (p < 1) requestAnimationFrame(step); else res();
+      };
+      step();
+    });
+
+    async function access() {
+      clearInterval(hexTimer);
+      const G = grant.current;
+      G.style.display = 'grid';
+      const big = G.querySelector('.g-big');
+      gsap.fromTo(G, { opacity: 0 }, { opacity: 1, duration: 0.12 });
+      await scramble(big, 'ACCESS GRANTED', fast ? 120 : 650);
+      if (dead) return;
+      await sleep(fast ? 300 : 520);
+      if (dead) return;
+      // wait (briefly) until the hero's particle cloud exists — it is already showing the same words beneath us
+      const t0 = performance.now();
+      while (!dead && cloudReady && !cloudReady() && performance.now() - t0 < 4000) await new Promise((r) => setTimeout(r, 50));
+      if (dead) return;
+      // glitch, then the words hand over to particles that shatter and re-form as the homepage
+      const tl = gsap.timeline({ onComplete: () => { root.current.style.display = 'none'; if (onDone) onDone(); } });
+      tl.to(crt.current, { x: () => (Math.random() - 0.5) * 26, skewX: 5, filter: 'hue-rotate(40deg) saturate(2)', duration: 0.05, repeat: 5, yoyo: true, ease: 'none' });
+      tl.set(crt.current, { x: 0, skewX: 0, filter: 'none' });
+      tl.add(() => { if (onReveal) onReveal(); });
+      tl.to(grant.current, { opacity: 0, duration: 0.18, ease: 'none' }, '<');
+      tl.to(crt.current, { opacity: 0, duration: 0.3, ease: 'power1.out' }, '<');
+    }
+
+    async function run() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const cores = navigator.hardwareConcurrency || '?';
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'unknown';
+      const gl2 = !!document.createElement('canvas').getContext('webgl2');
+
+      await sleep(250);
+      await type('ssh visitor@ariyansamal.dev');
+      add('<span class="t-dim">Connecting to ariyansamal.dev (17.3850° N, 78.4867° E) …</span>');
+      await sleep(260);
+      ok('handshake complete · cipher <b>chacha20-poly1305</b>');
+      await sleep(120);
+      ok(`visitor detected · <b>${w}×${h}</b> · <b>${cores}</b> cores · <b>${tz}</b>`);
+      await sleep(180);
+
+      await type('./boot --portfolio --year=2026');
+      add(`<pre class="t-art">${BANNER}</pre>`);
+      await sleep(140);
+      ok('kernel · <b>react 19</b> · <b>three</b> · <b>gsap</b> · <b>lenis</b>');
+      await sleep(90);
+      add(gl2 ? '<span class="t-ok">[ OK ]</span> webgl2 context acquired' : '<span class="t-warn">[ !! ]</span> webgl2 unavailable — falling back to 2d');
+      await sleep(90);
+      ok(`mounting <b>/work</b> · ${PROJECTS.length} products · all live`);
+      await sleep(200);
+
+      if (onWarm) onWarm();
+      await type('decrypt portfolio.enc --key=••••••••');
+      const bar = add('');
+      let shown = 0;
+      const t0 = performance.now();
+      const need = fast ? 400 : 1500;
+      while (!dead) {
+        const target = Math.min(assetFrac(), Math.min(1, (performance.now() - t0) / need));
+        shown += (target - shown) * 0.25;
+        const n = Math.round(shown * 100);
+        const fill = Math.round(shown * 28);
+        bar.innerHTML = `<span class="t-dim">decrypting</span> <span class="t-bar">[${'█'.repeat(fill)}${'░'.repeat(28 - fill)}]</span> <b>${String(n).padStart(3, ' ')}%</b>`;
+        if (n >= 100) break;
+        await sleep(40);
+      }
+      if (dead) return;
+      ok('integrity check passed · <b>0</b> errors');
+      await sleep(160);
+
+      await type('whoami');
+      add('<span class="t-hi">ariyan samal</span> — full-stack engineer · hyderabad · <b>available</b>');
+      await sleep(240);
+      await type('sudo open portfolio');
+      add('<span class="t-dim">[sudo] password for visitor: ••••••</span>');
+      await sleep(260);
+      add('<span class="t-ok">permission granted</span>');
+      await sleep(260);
+      if (dead) return;
+      sessionStorage.setItem('as_seen', '1');
+      await access();
+    }
+
+    run();
+    const cr = crt.current;
+    const rt = root.current;
+    const gr = grant.current;
+    return () => {
+      dead = true;
+      timers.forEach(clearTimeout);
+      clearTimeout(failsafe);
+      clearInterval(hexTimer);
+      gsap.killTweensOf([cr, rt, gr]);
+    };
+  }, [onWarm, cloudReady, onReveal, onDone]);
 
   return (
     <div ref={root} className="boot" aria-hidden="true">
-      <div className="boot__tiles" style={{ gridTemplateColumns: `repeat(${grid.cols}, 1fr)`, gridAutoRows: `${grid.size}px` }}>
-        {grid.tiles.map((t) => <i key={t.i} className={`boot__tile ${t.hot ? 'is-hot' : ''}`} />)}
-      </div>
-
-      <div className="boot__ui">
-        <div className="boot__log">
-          {LINES.map(([k, v]) => (
-            <div className="boot__row" key={k}>
-              <span className="boot__k">&gt; {k}</span>
-              <span className="boot__dots" />
-              <span className="boot__v">{v}</span>
-            </div>
-          ))}
-        </div>
-
-        <div className="boot__center">
-          <svg className="boot__tick" viewBox="0 0 420 420">
-            <circle cx="210" cy="210" r="196" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="2 7" opacity=".55" />
-            <circle cx="210" cy="210" r="150" fill="none" stroke="currentColor" strokeWidth="1" opacity=".25" />
-          </svg>
-          <svg className="boot__ring" viewBox="0 0 420 420">
-            <defs><path id="ringpath" d="M210 210 m-178 0 a178 178 0 1 1 356 0 a178 178 0 1 1 -356 0" /></defs>
-            <g className="boot__ringtext">
-              <text><textPath href="#ringpath" startOffset="0" textLength="1100" lengthAdjust="spacing">{RING}</textPath></text>
-            </g>
-          </svg>
-          <svg className="boot__mono" viewBox="0 0 100 100">
-            <path pathLength="1" d="M50 5 L93.3 25 V75 L50 95 L6.7 75 V25 Z" />
-            <path pathLength="1" d="M25 75 L40 30 L55 75 M32 60 H48" />
-            <path pathLength="1" d="M80 35 H60 L60 52 H80 L80 75 H60" />
-          </svg>
-        </div>
-
-        <div className="boot__foot">
-          <div ref={count} className="boot__count">000</div>
-          <div className="boot__meta">
-            <span>Ariyan Samal — Portfolio ’26</span>
-            <div className="boot__bar"><i ref={bar} /></div>
-            <span className="boot__hint">loading assets · {PROJECTS.length} projects</span>
+      <div ref={crt} className="boot__crt">
+        <div className="term">
+          <div className="term__bar">
+            <i /><i /><i />
+            <span>visitor@ariyansamal.dev — zsh — 120×36</span>
+            <em>secure ▸ tls1.3</em>
           </div>
+          <div className="term__body">
+            <div ref={main} className="term__main" />
+            <aside className="term__side">
+              <div className="term__pane">
+                <header>hexdump — /dev/portfolio</header>
+                <div ref={hex} className="term__hex" />
+              </div>
+              <div className="term__pane">
+                <header>assets — decrypting</header>
+                <div ref={files} className="term__files" />
+              </div>
+            </aside>
+          </div>
+          <div className="term__foot"><div className="term__meter"><i ref={meter} /></div><span>boot</span></div>
         </div>
+
+        <div ref={grant} className="boot__grant">
+          <div className="g-big">ACCESS GRANTED</div>
+          <div className="g-sub">welcome, visitor</div>
+        </div>
+        <div className="boot__scan" />
       </div>
     </div>
   );

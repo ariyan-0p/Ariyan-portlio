@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { startScroll, stopScroll, lockScroll, unlockScroll, gsap, ScrollTrigger, reduceMotion } from './lib/scroll';
 import Loader from './components/Loader';
 import Cursor from './components/Cursor';
@@ -15,6 +15,8 @@ import Contact from './components/Contact';
 
 export default function App() {
   const [ready, setReady] = useState(false);
+  const [warm, setWarm] = useState(false);
+  const cloud = useRef(false);
   const [palette, setPalette] = useState(false);
   const [openSlug, setOpenSlug] = useState(null);
 
@@ -35,6 +37,9 @@ export default function App() {
     return () => window.removeEventListener('keydown', key);
   }, []);
 
+  const onWarm = useCallback(() => setWarm(true), []);
+  const onCloud = useCallback(() => { cloud.current = true; }, []);
+  const cloudReady = useCallback(() => cloud.current, []);
   const onReveal = useCallback(() => {
     setReady(true);
     unlockScroll();
@@ -50,7 +55,7 @@ export default function App() {
 
   return (
     <>
-      <Loader onReveal={onReveal} onDone={onDone} />
+      <Loader onWarm={onWarm} cloudReady={cloudReady} onReveal={onReveal} onDone={onDone} />
       <Cursor />
       <div className="grain" aria-hidden="true" />
       <Nav onPalette={() => setPalette(true)} />
@@ -58,7 +63,7 @@ export default function App() {
       <Palette open={palette} onClose={() => setPalette(false)} onOpenProject={openFromPalette} />
 
       <main>
-        <Hero ready={ready} onPalette={() => setPalette(true)} />
+        <Hero warm={warm} ready={ready} onCloud={onCloud} onPalette={() => setPalette(true)} />
         <Marquee />
         <Work openSlug={openSlug} setOpenSlug={setOpenSlug} />
         <Manifesto />

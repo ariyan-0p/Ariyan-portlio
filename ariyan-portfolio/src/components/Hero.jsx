@@ -9,7 +9,7 @@ const STAGES = [
   { k: '03', label: 'Code', cap: 'Interface to infrastructure' },
 ];
 
-export default function Hero({ ready, onPalette }) {
+export default function Hero({ warm, ready, onPalette, onCloud }) {
   const root = useRef(null);
   const canvas = useRef(null);
   const api = useRef(null);
@@ -18,24 +18,25 @@ export default function Hero({ ready, onPalette }) {
   const [fallback, setFallback] = useState(false);
 
   useEffect(() => {
+    if (!warm) return undefined;
     let dead = false;
     createHeroParticles(canvas.current, { photo: PROFILE.photo, mobile: isTouch(), onStage: setStage }).then((p) => {
       if (dead) { p && p.destroy(); return; }
       if (!p) { setFallback(true); return; }
       api.current = p;
-      if (wantReveal.current) { p.reveal(); setTimeout(() => p.shock(0, 0), 350); }
+      if (onCloud) onCloud();
+      if (wantReveal.current) { p.reveal(); setTimeout(() => p.shock(0, 0), 120); }
     });
     return () => { dead = true; if (api.current) { api.current.destroy(); api.current = null; } };
-  }, []);
+  }, [warm, onCloud]);
 
   useEffect(() => {
     if (!ready) return undefined;
     wantReveal.current = true;
-    if (api.current) { api.current.reveal(); setTimeout(() => api.current && api.current.shock(0, 0), 350); }
+    if (api.current) { api.current.reveal(); setTimeout(() => api.current && api.current.shock(0, 0), 120); }
     const ctx = gsap.context(() => {
       const fast = reduceMotion();
-      gsap.from('.hero__fade', { opacity: 0, y: 26, duration: fast ? 0.01 : 1, stagger: 0.1, ease: 'expo.out', delay: 0.5 });
-      gsap.fromTo('.hero__canvas', { scale: 1.35, opacity: 0 }, { scale: 1, opacity: 1, duration: fast ? 0.01 : 2.4, ease: 'expo.out' });
+      gsap.from('.hero__fade', { opacity: 0, y: 26, duration: fast ? 0.01 : 1, stagger: 0.1, ease: 'expo.out', delay: 1.6 });
       gsap.from('.hero__frame i', { scale: 0, duration: 0.6, stagger: 0.05, ease: 'expo.out', delay: 0.2 });
     }, root);
     return () => ctx.revert();

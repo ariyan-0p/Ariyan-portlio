@@ -5,8 +5,8 @@ import * as THREE from 'three';
 // (with per-particle delay + turbulence in flight), then the cursor wake pushes them around.
 
 const VERT = /* glsl */ `
-attribute vec3 aA; attribute vec3 aB; attribute vec3 aC;
-attribute vec3 aColA; attribute vec3 aColB; attribute vec3 aColC;
+attribute vec3 aA; attribute vec3 aB; attribute vec3 aC; attribute vec3 aD;
+attribute vec3 aColA; attribute vec3 aColB; attribute vec3 aColC; attribute vec3 aColD;
 attribute vec3 aReal;
 attribute vec4 aRand;
 uniform float uTime, uMorph, uPixel, uSize, uDisperse, uShockT;
@@ -16,14 +16,8 @@ uniform vec3 uTrail[12];
 varying vec3 vCol;
 varying float vAlpha;
 
-vec3 chaos(vec4 r) {
-  float th = r.x * 6.2831853;
-  float ph = acos(2.0 * r.y - 1.0);
-  float rad = 4.0 + r.z * 11.0;
-  return vec3(sin(ph) * cos(th), sin(ph) * sin(th) * 0.7, cos(ph) * 0.8) * rad;
-}
-vec3 pick(int i) { if (i == 0) return aA; if (i == 1) return aB; if (i == 2) return aC; return chaos(aRand); }
-vec3 pickCol(int i) { if (i == 0) return aColA; if (i == 1) return aColB; if (i == 2) return aColC; return vec3(0.9, 0.3, 0.12) * 0.8; }
+vec3 pick(int i) { if (i == 0) return aA; if (i == 1) return aB; if (i == 2) return aC; return aD; }
+vec3 pickCol(int i) { if (i == 0) return aColA; if (i == 1) return aColB; if (i == 2) return aColC; return aColD; }
 
 void main() {
   vec3 pf = pick(uFrom);
@@ -104,7 +98,7 @@ function pickIndex(cum, total) {
   return lo;
 }
 
-function textTarget(lines, font, W, H, boxW, boxH, N, depth) {
+function textTarget(lines, font, W, H, boxW, boxH, N, depth, hot = false) {
   const cw = 1100;
   const ch = Math.max(300, Math.round((cw * H) / W));
   const c = document.createElement('canvas');
@@ -137,7 +131,7 @@ function textTarget(lines, font, W, H, boxW, boxH, N, depth) {
     pos[i * 3] = ((xs[k] + Math.random() - 0.5) / cw - 0.5) * W;
     pos[i * 3 + 1] = (0.5 - (ys[k] + Math.random() - 0.5) / ch) * H;
     pos[i * 3 + 2] = (Math.random() - 0.5) * depth;
-    const c1 = Math.random() < 0.2 ? ORANGE : BONE;
+    const c1 = (hot ? Math.random() < 0.88 : Math.random() < 0.2) ? ORANGE : BONE;
     const v = 0.75 + Math.random() * 0.25;
     col[i * 3] = c1[0] * v; col[i * 3 + 1] = c1[1] * v; col[i * 3 + 2] = c1[2] * v;
   }
@@ -243,7 +237,7 @@ export async function createHeroParticles(canvas, { photo, mobile, onStage }) {
   attr('aRand', rand, 4);
   const A = {};
   const blank = () => new Float32Array(N * 3);
-  ['aA', 'aB', 'aC', 'aColA', 'aColB', 'aColC', 'aReal'].forEach((n) => { A[n] = attr(n, blank()); });
+  ['aA', 'aB', 'aC', 'aD', 'aColA', 'aColB', 'aColC', 'aColD', 'aReal'].forEach((n) => { A[n] = attr(n, blank()); });
 
   let W = 1;
   let H = 1;
@@ -259,9 +253,11 @@ export async function createHeroParticles(canvas, { photo, mobile, onStage }) {
       : textTarget(['ARIYAN SAMAL'], { weight: 800, family: '"Inter Tight", sans-serif', lh: 0.9, dy: 0.02 }, W, H, 0.9, 0.46, N, 0.5);
     const code = textTarget(['</>'], { weight: 500, family: '"JetBrains Mono", monospace', lh: 1 }, W, H, tall ? 0.9 : 0.62, tall ? 0.3 : 0.55, N, 1.4);
     const face = faceTarget(img, W, H, N);
+    const access = textTarget(['ACCESS GRANTED'], { weight: 800, family: '"Inter Tight", sans-serif', lh: 0.9, dy: 0.02 }, W, H, tall ? 0.9 : 0.79, 0.3, N, 0.3, true);
     A.aA.array.set(name.pos); A.aColA.array.set(name.col);
     A.aB.array.set(face.pos); A.aColB.array.set(face.col); A.aReal.array.set(face.real);
     A.aC.array.set(code.pos); A.aColC.array.set(code.col);
+    A.aD.array.set(access.pos); A.aColD.array.set(access.col);
     Object.values(A).forEach((a) => { a.needsUpdate = true; });
   };
 
