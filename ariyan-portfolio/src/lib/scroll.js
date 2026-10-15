@@ -63,8 +63,11 @@ export function pinCards(cards, stack) {
   }));
   return () => sts.forEach((s) => s.kill());
 }
-export const lockScroll = () => lenis && lenis.stop();
-export const unlockScroll = () => lenis && lenis.start();
+// Several layers can lock the page at once (boot sequence, command palette, project case).
+// Each lock has its own key, and scrolling resumes only when the last one is released.
+const locks = new Set();
+export const lockScroll = (key = 'default') => { locks.add(key); if (lenis) lenis.stop(); };
+export const unlockScroll = (key = 'default') => { locks.delete(key); if (!locks.size && lenis) lenis.start(); };
 
 export function goTo(id) {
   const el = id === 'top' ? 0 : document.getElementById(id);

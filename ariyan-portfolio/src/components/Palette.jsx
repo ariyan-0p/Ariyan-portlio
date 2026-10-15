@@ -44,12 +44,12 @@ export default function Palette({ open, onClose, onOpenProject }) {
 
   useEffect(() => {
     if (open) {
-      lockScroll();
+      lockScroll('palette');
       if (input.current) input.current.focus();
       const id = setTimeout(() => input.current && input.current.focus(), 60);
       return () => clearTimeout(id);
     }
-    unlockScroll();
+    unlockScroll('palette');
     return undefined;
   }, [open]);
 

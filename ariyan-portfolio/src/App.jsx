@@ -22,7 +22,7 @@ export default function App() {
 
   useEffect(() => {
     startScroll();
-    lockScroll();
+    lockScroll('boot');
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => ScrollTrigger.refresh());
     return stopScroll;
   }, []);
@@ -42,7 +42,7 @@ export default function App() {
   const cloudReady = useCallback(() => cloud.current, []);
   const onReveal = useCallback(() => {
     setReady(true);
-    unlockScroll();
+    unlockScroll('boot');
     if (reduceMotion()) return;
     // everything else slides in as the tiles open
     gsap.from('.nav > *', { y: -34, opacity: 0, duration: 1.1, stagger: 0.09, ease: 'expo.out', delay: 0.75 });

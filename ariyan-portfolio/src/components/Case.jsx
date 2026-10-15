@@ -16,7 +16,7 @@ export default function Case({ slug, onClose, onNav }) {
     const el = root.current;
     if (slug) {
       setShown(slug);
-      lockScroll();
+      lockScroll('case');
       el.style.visibility = 'visible';
       el.scrollTop = 0;
       const swap = wasOpen.current; // switching projects: keep the panel, replay only the content
@@ -27,13 +27,14 @@ export default function Case({ slug, onClose, onNav }) {
         gsap.fromTo('.case__fade', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.9, stagger: 0.08, ease: 'expo.out', delay: 0.6, overwrite: true });
         gsap.fromTo('.case__shot', { scale: 1.12, opacity: 0 }, { scale: 1, opacity: 1, duration: 1.4, ease: 'expo.out', delay: 0.5, overwrite: true });
       }, el);
-      return () => ctx.revert();
+      // kill, never revert: reverting would rewind the panel to its hidden, clipped starting state
+      return () => ctx.kill();
     }
     if (shown) {
       wasOpen.current = false;
       gsap.to(el, {
         clipPath: 'inset(0% 0% 100% 0%)', duration: 0.8, ease: 'expo.inOut', overwrite: true,
-        onComplete: () => { el.style.visibility = 'hidden'; setShown(null); unlockScroll(); },
+        onComplete: () => { el.style.visibility = 'hidden'; setShown(null); unlockScroll('case'); },
       });
     }
     return undefined;
@@ -43,6 +44,7 @@ export default function Case({ slug, onClose, onNav }) {
   useEffect(() => {
     if (!slug) return undefined;
     const key = (e) => {
+      if (/input|textarea/i.test(e.target.tagName)) return;
       if (e.key === 'Escape') onClose();
       if (e.key === 'ArrowRight') onNav(next.slug);
       if (e.key === 'ArrowLeft') onNav(prev.slug);
