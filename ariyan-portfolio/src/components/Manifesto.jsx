@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { gsap, ScrollTrigger, getLenis } from '../lib/scroll';
+import { gsap, ScrollTrigger, getLenis, isIOS, pinStage } from '../lib/scroll';
 import { CAPABILITIES, PROJECTS } from '../data';
 
 // Flat drawings that sit on each slab of the exploded stack.
@@ -95,6 +95,8 @@ export default function Manifesto() {
     }, root);
     return () => ctx.revert();
   }, []);
+
+  useEffect(() => (isIOS() ? pinStage(pin.current, pin.current.querySelector('.mf__stage')) : undefined), []);
 
   const jump = (i) => {
     const el = pin.current;

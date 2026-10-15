@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { gsap } from '../lib/scroll';
+import { gsap, isIOS, pinCards } from '../lib/scroll';
 import { PROJECTS } from '../data';
 
 const STEPS = [
@@ -61,6 +61,7 @@ export default function Process() {
   const root = useRef(null);
 
   useEffect(() => {
+    let cleanup = () => {};
     const ctx = gsap.context(() => {
       const cards = gsap.utils.toArray('.prc__card');
       cards.forEach((card, i) => {
@@ -70,12 +71,16 @@ export default function Process() {
           scrollTrigger: { trigger: cards[i + 1], start: 'top 88%', end: 'top 14%', scrub: true },
         });
       });
+      if (isIOS()) {
+        const stack = root.current.querySelector('.prc__stack');
+        cleanup = pinCards(cards, stack);
+      }
       gsap.from('.prc__head .ch__in', {
         yPercent: 110, duration: 1.2, stagger: 0.04, ease: 'expo.out',
         scrollTrigger: { trigger: '.prc__head', start: 'top 85%' },
       });
     }, root);
-    return () => ctx.revert();
+    return () => { cleanup(); ctx.revert(); };
   }, []);
 
   const split = (t) => t.split('').map((c, i) => <span className="ch" key={i}><span className="ch__in">{c === ' ' ? ' ' : c}</span></span>);

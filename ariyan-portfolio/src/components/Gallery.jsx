@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ScrollTrigger, getLenis, isTouch } from '../lib/scroll';
+import { ScrollTrigger, getLenis, isTouch, isIOS, pinStage } from '../lib/scroll';
 import { createGallery } from '../lib/gallery';
 import { PROJECTS } from '../data';
 
@@ -32,6 +32,8 @@ export default function Gallery({ onOpen, onFallback }) {
     return () => { st.kill(); g.destroy(); api.current = null; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => (isIOS() ? pinStage(wrap.current, wrap.current.querySelector('.gal__stage')) : undefined), []);
 
   const jump = useCallback((i) => {
     const el = wrap.current;

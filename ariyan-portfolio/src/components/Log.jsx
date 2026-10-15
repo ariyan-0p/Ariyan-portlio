@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ScrollTrigger, getLenis } from '../lib/scroll';
+import { ScrollTrigger, getLenis, isIOS, pinStage } from '../lib/scroll';
 import { LOG } from '../data';
 
 // Experience as a pinned `git log --graph` + a live `git show <hash>` terminal.
@@ -54,6 +54,8 @@ export default function Log() {
     return () => clearInterval(id);
   }, [active, total]);
   const shown = typed.for === active ? typed.n : 0; // a new commit starts from nothing
+
+  useEffect(() => (isIOS() ? pinStage(pin.current, pin.current.querySelector('.lg__stage')) : undefined), []);
 
   const jump = (i) => {
     const el = pin.current;
