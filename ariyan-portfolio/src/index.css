@@ -485,10 +485,21 @@ html.invert .case__meta, html.invert .case__nav { --line: rgba(236, 232, 224, 0.
 /* ───────────────────────── Log ───────────────────────── */
 .log { background: var(--bone); color: var(--ink); padding: clamp(5rem, 10vw, 10rem) var(--pad); position: relative; z-index: 2; }
 .log .mf__idx { color: var(--ink); }
-.log__head { margin-bottom: clamp(2rem, 5vw, 5rem); }
-.log__cmd { margin-top: 2rem; font: 400 0.9rem var(--mono); color: var(--mute); }
+.log__wrap { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(2rem, 6vw, 7rem); align-items: start; }
+.log__side { position: sticky; top: 6.5rem; display: grid; gap: clamp(1.2rem, 2.4vw, 2rem); align-self: start; }
+.log__side .mf__idx { margin-bottom: 0; }
+.log__h { font: 700 clamp(2rem, 4.2vw, 4.6rem)/1.02 var(--display); letter-spacing: -0.055em; max-width: 12em; }
+.log__h em { font: italic 400 1.1em/1 var(--serif); letter-spacing: -0.02em; color: var(--sig); }
+.log__cmd { font: 400 0.95rem var(--mono); color: var(--mute); }
 .log__cmd b { color: var(--sig); margin-right: 0.6rem; font-weight: 500; }
-.log__list { position: relative; --rail: 12.5rem; }
+.log__stats { display: grid; grid-template-columns: repeat(3, auto); justify-content: start; gap: clamp(1rem, 3vw, 2.6rem); padding: 1.3rem 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.log__stats b { display: block; font: 800 clamp(2.4rem, 4.6vw, 4.2rem)/0.9 var(--display); letter-spacing: -0.06em; font-variant-numeric: tabular-nums; }
+.log__stats span { display: block; margin-top: 0.5rem; font: 400 0.8rem var(--mono); text-transform: uppercase; letter-spacing: 0.07em; color: var(--mute); }
+.log__now { display: grid; gap: 0.35rem; padding: 1.1rem 1.3rem; border: 2px solid var(--ink); border-radius: 18px; background: var(--ink); color: var(--bone); max-width: 26rem; }
+.log__now-k { display: inline-flex; align-items: center; font: 500 0.8rem var(--mono); text-transform: uppercase; letter-spacing: 0.1em; color: var(--sig); }
+.log__now b { font: 700 1.5rem/1.05 var(--display); letter-spacing: -0.04em; }
+.log__now > span:last-child { font: 400 0.9rem var(--mono); opacity: 0.7; }
+.log__list { position: relative; --rail: 7.6rem; }
 .log__rail { position: absolute; left: calc(var(--rail) + 1.1rem - 1px); top: 0; bottom: 0; width: 2px; background: rgba(12, 12, 11, 0.15); }
 .log__rail i { position: absolute; inset: 0; background: var(--sig); transform: scaleY(0); }
 .log__item { position: relative; display: grid; grid-template-columns: var(--rail) 2.2rem minmax(0, 1fr); gap: 1rem; padding-bottom: clamp(2.2rem, 5vw, 4.5rem); }
@@ -501,8 +512,8 @@ html.invert .case__meta, html.invert .case__nav { --line: rgba(236, 232, 224, 0.
 .log__item.is-edu .log__node { border-radius: 2px; border-color: var(--ink); }
 .log__card { grid-column: 3; display: grid; gap: 0.5rem; max-width: 46rem; }
 .log__date { font: 400 0.84rem var(--mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--mute); }
-.log__card h3 { font: 700 clamp(1.8rem, 4.2vw, 4rem)/0.98 var(--display); letter-spacing: -0.05em; }
-.log__org { font: italic 400 clamp(1.2rem, 2vw, 1.8rem)/1.1 var(--serif); color: var(--sig); }
+.log__card h3 { font: 700 clamp(1.6rem, 2.9vw, 2.9rem)/1 var(--display); letter-spacing: -0.05em; }
+.log__org { font: italic 400 clamp(1.15rem, 1.7vw, 1.6rem)/1.1 var(--serif); color: var(--sig); }
 .log__org span { color: var(--mute); }
 .log__card p { font: 400 1rem/1.5 var(--display); opacity: 0.72; max-width: 36rem; margin-top: 0.4rem; }
 
@@ -597,6 +608,9 @@ html.invert .case__meta, html.invert .case__nav { --line: rgba(236, 232, 224, 0.
   .cap__n { display: none; }
   .cap__glyph { max-width: 11rem; justify-self: start; order: -1; }
   .cap__card { top: 7vh; }
+  .log__wrap { grid-template-columns: 1fr; }
+  .log__side { position: static; }
+  .log__stats { grid-template-columns: repeat(3, 1fr); }
   .log__list { --rail: 0px; }
   .log__rail { left: 6px; }
   .log__item { grid-template-columns: 14px minmax(0, 1fr); gap: 0 1.1rem; }
