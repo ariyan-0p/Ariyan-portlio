@@ -51,6 +51,7 @@ export default function Hero({ warm, ready, onPalette, onCloud }) {
   }, []);
 
   const cur = STAGES[stage] || STAGES[0];
+  const cap = stage === 1 && isTouch() ? 'Hello. Touch the cloud — disturb the pixels' : cur.cap;
 
   return (
     <section id="top" ref={root} className={`hero ${fallback ? 'is-fallback' : ''}`}>
@@ -67,7 +68,7 @@ export default function Hero({ warm, ready, onPalette, onCloud }) {
 
       <div className="hero__foot">
         <div className="hero__copy">
-          <p className="hero__cap hero__fade" key={cur.k}><b>{cur.k}</b>{cur.cap}</p>
+          <p className="hero__cap hero__fade" key={cur.k}><b>{cur.k}</b>{cap}</p>
           <p className="hero__lede hero__fade">
             Building <em>whole products</em> — {PROJECTS.length} shipped, all live.
           </p>
