@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { startScroll, stopScroll, ScrollTrigger } from './lib/scroll';
+import { startScroll, stopScroll, lockScroll, unlockScroll, gsap, ScrollTrigger, reduceMotion } from './lib/scroll';
 import Loader from './components/Loader';
 import Cursor from './components/Cursor';
 import Nav from './components/Nav';
@@ -20,6 +20,7 @@ export default function App() {
 
   useEffect(() => {
     startScroll();
+    lockScroll();
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => ScrollTrigger.refresh());
     return stopScroll;
   }, []);
@@ -34,15 +35,22 @@ export default function App() {
     return () => window.removeEventListener('keydown', key);
   }, []);
 
-  const onDone = useCallback(() => {
+  const onReveal = useCallback(() => {
     setReady(true);
+    unlockScroll();
+    if (reduceMotion()) return;
+    // everything else slides in as the tiles open
+    gsap.from('.nav > *', { y: -34, opacity: 0, duration: 1.1, stagger: 0.09, ease: 'expo.out', delay: 0.5 });
+    gsap.from('.ruler', { x: 40, opacity: 0, duration: 1.2, ease: 'expo.out', delay: 1.1 });
+  }, []);
+  const onDone = useCallback(() => {
     requestAnimationFrame(() => ScrollTrigger.refresh());
   }, []);
   const openFromPalette = useCallback((slug) => setTimeout(() => setOpenSlug(slug), 120), []);
 
   return (
     <>
-      <Loader onDone={onDone} />
+      <Loader onReveal={onReveal} onDone={onDone} />
       <Cursor />
       <div className="grain" aria-hidden="true" />
       <Nav onPalette={() => setPalette(true)} />

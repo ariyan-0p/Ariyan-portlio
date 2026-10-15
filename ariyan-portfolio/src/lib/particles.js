@@ -405,6 +405,7 @@ export async function createHeroParticles(canvas, { photo, mobile, onStage }) {
   return {
     reveal() { if (!S.started) { S.started = true; goTo(0, false); } },
     goTo(i) { S.started = true; goTo(i, true); },
+    shock(x = 0, y = 0) { mat.uniforms.uShockP.value.set(x, y); S.shock = 0; },
     setDisperse(v) { S.disperse = v; },
     destroy() {
       S.dead = true;
