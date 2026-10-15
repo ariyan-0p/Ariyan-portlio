@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { gsap, goTo, reduceMotion } from '../lib/scroll';
+import { gsap, ScrollTrigger, goTo, isTouch, reduceMotion } from '../lib/scroll';
 import { mountDither } from '../lib/dither';
 import { PROFILE, PROJECTS } from '../data';
 
@@ -33,29 +33,53 @@ export default function Hero({ ready, onPalette }) {
     return () => ctx.revert();
   }, [ready]);
 
-  // parallax: portrait drifts slower than the page
+  // scroll: portrait dissolves into dither, the name drifts up
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.to('.hero__portrait', { yPercent: 14, ease: 'none', scrollTrigger: { trigger: root.current, start: 'top top', end: 'bottom top', scrub: true } });
-      gsap.to('.hero__name', { yPercent: -12, ease: 'none', scrollTrigger: { trigger: root.current, start: 'top top', end: 'bottom top', scrub: true } });
+      ScrollTrigger.create({
+        trigger: root.current, start: 'top top', end: 'bottom 20%', scrub: true,
+        onUpdate: (self) => dither.current && dither.current.setDissolve(Math.min(1, self.progress * 1.15)),
+      });
+      gsap.to('.hero__name', { yPercent: -14, ease: 'none', scrollTrigger: { trigger: root.current, start: 'top top', end: 'bottom top', scrub: true } });
+      gsap.to('.hero__portrait', { yPercent: 8, ease: 'none', scrollTrigger: { trigger: root.current, start: 'top top', end: 'bottom top', scrub: true } });
     }, root);
     return () => ctx.revert();
+  }, []);
+
+  // type reacts to the cursor: letters swell toward it
+  useEffect(() => {
+    if (isTouch() || reduceMotion()) return undefined;
+    const letters = Array.from(root.current.querySelectorAll('.hero__name .ch__in'));
+    const m = { x: -9999, y: -9999 };
+    const onMove = (e) => { m.x = e.clientX; m.y = e.clientY; };
+    window.addEventListener('pointermove', onMove, { passive: true });
+    const cur = letters.map(() => 760);
+    const tick = () => {
+      letters.forEach((el, i) => {
+        const r = el.getBoundingClientRect();
+        const d = Math.hypot(r.left + r.width / 2 - m.x, r.top + r.height / 2 - m.y);
+        const target = 700 + 200 * Math.max(0, 1 - d / (r.height * 1.5));
+        cur[i] += (target - cur[i]) * 0.12;
+        el.style.fontWeight = Math.round(cur[i]);
+      });
+    };
+    gsap.ticker.add(tick);
+    return () => { gsap.ticker.remove(tick); window.removeEventListener('pointermove', onMove); };
   }, []);
 
   return (
     <section id="top" ref={root} className="hero">
       <div className="hero__frame" aria-hidden="true"><i /><i /><i /><i /></div>
 
+      <div className="hero__portrait" data-cursor="PAINT">
+        <canvas ref={canvas} />
+        <img src={PROFILE.photo} alt="Ariyan Samal" className="hero__fallback" />
+      </div>
+
       <div className="hero__meta hero__fade">
         <span>{PROFILE.location}</span>
         <span>{PROFILE.coords}</span>
         <span className="hero__avail"><i className="dot" />Available — freelance & full-time</span>
-      </div>
-
-      <div className="hero__portrait" data-cursor="FOCUS">
-        <canvas ref={canvas} />
-        <img src={PROFILE.photo} alt="Ariyan Samal" className="hero__fallback" />
-        <div className="hero__tag hero__fade"><b>FIG.01</b> Move to focus</div>
       </div>
 
       <h1 className="hero__name" aria-label="Ariyan Samal">
@@ -71,7 +95,7 @@ export default function Hero({ ready, onPalette }) {
           <button className="btn btn--solid" onClick={() => goTo('work')} data-cursor="GO"><span>See the work</span><i>↓</i></button>
           <button className="btn" onClick={onPalette}><span>Command menu</span><kbd>⌘K</kbd></button>
         </div>
-        <div className="hero__scroll hero__fade" aria-hidden="true"><span>Scroll</span><i /></div>
+        <div className="hero__hint hero__fade" aria-hidden="true">Move your cursor — paint the photo back in</div>
       </div>
     </section>
   );

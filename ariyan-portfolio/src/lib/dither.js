@@ -13,8 +13,10 @@ varying vec2 vUv;
 uniform sampler2D uTex;
 uniform vec2 uRes;
 uniform vec2 uImg;
-uniform vec2 uMouse;
+uniform vec3 uTrail[24];
+uniform vec2 uHead;
 uniform float uLens;
+uniform float uDissolve;
 uniform float uTime;
 uniform float uIntro;
 uniform float uCell;
@@ -39,29 +41,41 @@ void main(){
   float breathe = sin(uTime * .6 + cuv.y * 6.) * .004;
   vec3 pix = texture2D(uTex, cover(cuv + vec2(breathe, 0.))).rgb;
   float lum = dot(pix, vec3(.299, .587, .114));
-  lum = clamp((lum - .55) * 1.8 + .42, 0., 1.);
+  lum = 1. - lum;                       // negative: bright sky drops out, subject lights up
+  lum = clamp((lum - .30) * 1.7 + .30, 0., 1.);
 
   float d = bayer8(cell) - .5;
-  float v = lum + d * .62;
-  vec3 dith = v < .30 ? uInk : (v < .56 ? uSignal : uBone);
+  float v = lum + d * .6;
+  vec3 dith = v < .42 ? uInk : (v < .68 ? uSignal : uBone);
 
   vec3 real = texture2D(uTex, cover(vUv)).rgb;
-  real = (real - .5) * 1.08 + .5;
+  real = (real - .5) * 1.1 + .5;
 
   float asp = uRes.x / uRes.y;
-  float dist = length((vUv - uMouse) * vec2(asp, 1.));
-  float r = .34 * uLens;
-  float m = smoothstep(r, r * .82, dist);
-  float ring = smoothstep(.006, 0., abs(dist - r)) * step(.01, uLens);
+  float m = 0.;
+  for (int i = 0; i < 24; i++) {
+    vec3 t = uTrail[i];
+    if (t.z > 0.) {
+      float dd = length((vUv - t.xy) * vec2(asp, 1.));
+      float r = .115 * t.z;
+      m = max(m, smoothstep(r, r * .55, dd));
+    }
+  }
+  float hd = length((vUv - uHead) * vec2(asp, 1.));
+  float ring = smoothstep(.005, 0., abs(hd - .05)) * step(.01, uLens);
 
   vec3 col = mix(dith, real, m);
-  col = mix(col, uInk, ring);
+  col = mix(col, uBone, ring);
 
   // intro wipe: scan from the top, dithered edge
   float n = bayer8(cell) * .25;
   float visible = step(1. - vUv.y, uIntro * 1.2 - n * .2);
 
-  gl_FragColor = vec4(mix(uBone, col, visible), 1.);
+  float gone = step(bayer8(cell) * .92 + .04, uDissolve);
+  float edge = smoothstep(0., .34, vUv.x);
+  gone = max(gone, step(edge, bayer8(cell) * .96 + .02));
+  col = mix(col, uInk, gone);
+  gl_FragColor = vec4(mix(uInk, col, visible), 1.);
 }`;
 
 const hex = (h) => {
@@ -101,15 +115,20 @@ export function mountDither(canvas, src, { onReady, colors } = {}) {
 
   const U = (n) => gl.getUniformLocation(prog, n);
   const u = {
-    tex: U('uTex'), res: U('uRes'), img: U('uImg'), mouse: U('uMouse'), lens: U('uLens'),
+    tex: U('uTex'), res: U('uRes'), img: U('uImg'), trail: U('uTrail'), head: U('uHead'), dissolve: U('uDissolve'), lens: U('uLens'),
     time: U('uTime'), intro: U('uIntro'), cell: U('uCell'), ink: U('uInk'), signal: U('uSignal'), bone: U('uBone'),
   };
   const c = { ink: '#0c0c0b', signal: '#ff4d1f', bone: '#ece8e0', ...colors };
+  const TRAIL = 24;
+  const LIFE = 1.9;
+  const trail = Array.from({ length: TRAIL }, () => ({ x: 0, y: 0, t: -99 }));
+  const trailBuf = new Float32Array(TRAIL * 3);
+  let ti = 0;
   gl.uniform3fv(u.ink, hex(c.ink));
   gl.uniform3fv(u.signal, hex(c.signal));
   gl.uniform3fv(u.bone, hex(c.bone));
 
-  const state = { mx: 0.5, my: 0.5, tx: 0.5, ty: 0.5, lens: 0, lensT: 0, intro: 0, introT: 0, last: 0, idle: true, visible: true, raf: 0, dead: false };
+  const state = { mx: 0.5, my: 0.5, tx: 0.5, ty: 0.5, lens: 0, lensT: 0, intro: 0, introT: 0, dissolve: 0, lastPush: 0, px: -9, py: -9, last: 0, idle: true, visible: true, raf: 0, dead: false };
   let imgW = 1;
   let imgH = 1;
 
@@ -123,7 +142,7 @@ export function mountDither(canvas, src, { onReady, colors } = {}) {
     }
     gl.viewport(0, 0, w, h);
     gl.uniform2f(u.res, w, h);
-    gl.uniform1f(u.cell, Math.max(3, Math.round(3.2 * dpr)));
+    gl.uniform1f(u.cell, Math.max(3, Math.round(3.4 * dpr)));
   };
 
   const img = new Image();
@@ -148,6 +167,16 @@ export function mountDither(canvas, src, { onReady, colors } = {}) {
   };
   img.src = src;
 
+  const push = (x, y, now) => {
+    const dx = (x - state.px) * (canvas.clientWidth / canvas.clientHeight);
+    const dy = y - state.py;
+    if (dx * dx + dy * dy < 0.0004) return; // ~2% of the height between samples
+    state.px = x; state.py = y;
+    const p = trail[ti];
+    p.x = x; p.y = y; p.t = now;
+    ti = (ti + 1) % TRAIL;
+  };
+
   const onMove = (e) => {
     const r = canvas.getBoundingClientRect();
     const x = (e.clientX - r.left) / r.width;
@@ -156,8 +185,9 @@ export function mountDither(canvas, src, { onReady, colors } = {}) {
     state.ty = y;
     state.idle = false;
     state.lastMove = performance.now();
-    const near = x > -0.25 && x < 1.25 && y > -0.25 && y < 1.25;
+    const near = x > -0.15 && x < 1.15 && y > -0.15 && y < 1.15;
     state.lensT = near ? 1 : 0.0;
+    if (near) push(x, y, performance.now());
   };
   const onLeave = () => { state.lensT = 0; };
   window.addEventListener('pointermove', onMove, { passive: true });
@@ -182,16 +212,25 @@ export function mountDither(canvas, src, { onReady, colors } = {}) {
     // idle wander: when the pointer has been still for a while the lens drifts by itself
     if (!state.idle && now - (state.lastMove || 0) > 2600) state.idle = true;
     if (state.idle) {
-      state.tx = 0.5 + Math.sin(t * 0.55) * 0.28;
-      state.ty = 0.52 + Math.cos(t * 0.42) * 0.3;
+      state.tx = 0.5 + Math.sin(t * 0.55) * 0.3;
+      state.ty = 0.5 + Math.cos(t * 0.42) * 0.32;
       state.lensT = 0.9;
+      push(state.tx, state.ty, now);
     }
     state.mx += (state.tx - state.mx) * k(7);
     state.my += (state.ty - state.my) * k(7);
     state.lens += (state.lensT - state.lens) * k(5);
     state.intro += (state.introT - state.intro) * k(2.6);
 
-    gl.uniform2f(u.mouse, state.mx, state.my);
+    for (let i = 0; i < TRAIL; i++) {
+      const p = trail[i];
+      const age = (now - p.t) / 1000;
+      const a = age >= LIFE ? 0 : Math.pow(1 - age / LIFE, 0.7);
+      trailBuf[i * 3] = p.x; trailBuf[i * 3 + 1] = p.y; trailBuf[i * 3 + 2] = a;
+    }
+    gl.uniform3fv(u.trail, trailBuf);
+    gl.uniform2f(u.head, state.mx, state.my);
+    gl.uniform1f(u.dissolve, state.dissolve);
     gl.uniform1f(u.lens, state.lens);
     gl.uniform1f(u.time, t);
     gl.uniform1f(u.intro, state.intro);
@@ -201,6 +240,7 @@ export function mountDither(canvas, src, { onReady, colors } = {}) {
 
   return {
     reveal() { state.introT = 1; },
+    setDissolve(v) { state.dissolve = v; },
     destroy() {
       state.dead = true;
       cancelAnimationFrame(state.raf);
