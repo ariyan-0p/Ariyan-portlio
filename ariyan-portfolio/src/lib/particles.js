@@ -336,6 +336,7 @@ export async function createHeroParticles(canvas, { photo, mobile, onStage }) {
   const goTo = (i, manual) => {
     if (i === S.stage && S.morph >= 1) return;
     S.from = S.morph >= 1 ? (S.stage < 0 ? 3 : S.stage) : S.to;
+    S.dur = S.from === 3 ? 1.15 : 2.6;
     S.to = i;
     S.stage = i;
     S.morph = 0;
@@ -440,14 +441,26 @@ export async function createHeroParticles(canvas, { photo, mobile, onStage }) {
   S.raf = requestAnimationFrame(frame);
 
   return {
-    reveal() { if (!S.started) { S.started = true; goTo(0, false); } },
-    goTo(i) { S.started = true; goTo(i, true); },
+    // hold the spinning galaxy for `delay` seconds, then snap it into the name with a shockwave
+    reveal(delay = 3.4) {
+      if (S.started || S.pending) return;
+      S.pending = setTimeout(() => {
+        S.pending = 0;
+        if (S.started || S.dead) return;
+        S.started = true;
+        goTo(0, false);
+        mat.uniforms.uShockP.value.set(0, 0);
+        S.shock = 0;
+      }, delay * 1000);
+    },
+    goTo(i) { clearTimeout(S.pending); S.pending = 0; S.started = true; goTo(i, true); },
     shock(x = 0, y = 0) { mat.uniforms.uShockP.value.set(x, y); S.shock = 0; },
     setDisperse(v) { S.disperse = v; },
     destroy() {
       S.dead = true;
       cancelAnimationFrame(S.raf);
       clearTimeout(rt);
+      clearTimeout(S.pending);
       io.disconnect();
       ro.disconnect();
       window.removeEventListener('pointermove', onMove);

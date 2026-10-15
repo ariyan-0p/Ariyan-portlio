@@ -24,7 +24,7 @@ export default function Hero({ warm, ready, onPalette, onCloud }) {
       if (!p) { setFallback(true); return; }
       api.current = p;
       if (onCloud) onCloud();
-      if (wantReveal.current) { p.reveal(); setTimeout(() => p.shock(0, 0), 120); }
+      if (wantReveal.current) p.reveal(reduceMotion() ? 0.2 : 3.4);
     });
     return () => { dead = true; if (api.current) { api.current.destroy(); api.current = null; } };
   }, [warm, onCloud]);
@@ -32,7 +32,7 @@ export default function Hero({ warm, ready, onPalette, onCloud }) {
   useEffect(() => {
     if (!ready) return undefined;
     wantReveal.current = true;
-    if (api.current) { api.current.reveal(); setTimeout(() => api.current && api.current.shock(0, 0), 120); }
+    if (api.current) api.current.reveal(reduceMotion() ? 0.2 : 3.4);
     const ctx = gsap.context(() => {
       const fast = reduceMotion();
       gsap.from('.hero__fade', { opacity: 0, y: 26, duration: fast ? 0.01 : 1, stagger: 0.1, ease: 'expo.out', delay: 1.6 });
