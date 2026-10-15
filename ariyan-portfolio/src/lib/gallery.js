@@ -113,6 +113,8 @@ export function createGallery(canvas, items, { onActive, onHover, onOpen, mobile
     group.add(mesh, frame);
     group.position.set((i % 2 ? 1 : -1) * 3.5 + Math.sin(i * 1.7) * 0.7, Math.cos(i * 1.3) * 1.1, -i * GAP);
     group.rotation.set(Math.cos(i * 0.9) * 0.05, Math.sin(i * 2.1) * 0.24, Math.sin(i * 1.4) * 0.05);
+    group.userData.bx = group.position.x;
+    group.userData.ry = group.rotation.y;
     scene.add(group);
     return { group, mesh, mat, frame, hover: 0, hoverT: 0, mouse: new THREE.Vector2(0.5, 0.5) };
   });
@@ -127,7 +129,7 @@ export function createGallery(canvas, items, { onActive, onHover, onOpen, mobile
   }
   const dustGeo = new THREE.BufferGeometry();
   dustGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  const dust = new THREE.Points(dustGeo, new THREE.PointsMaterial({ color: 0xff4d1f, size: 0.07, transparent: true, opacity: 0.8, depthWrite: false, sizeAttenuation: true }));
+  const dust = new THREE.Points(dustGeo, new THREE.PointsMaterial({ color: 0xff4d1f, size: 1.8, transparent: true, opacity: 0.8, depthWrite: false, sizeAttenuation: false }));
   scene.add(dust);
 
   // ── state ──
@@ -153,6 +155,8 @@ export function createGallery(canvas, items, { onActive, onHover, onOpen, mobile
     const asp = w / h;
     st.dist = asp < 1 ? Math.min(15, W / 0.86 / (2 * Math.tan(THREE.MathUtils.degToRad(35)) * asp)) : DIST;
     st.xf = asp < 1 ? 1 : 0.55;
+    const xs = asp < 1 ? 0.28 : 1;
+    planes.forEach((p) => { p.group.position.x = p.group.userData.bx * xs; p.group.rotation.y = p.group.userData.ry * (asp < 1 ? 0.45 : 1); });
     if (!st.init) { st.z = st.dist; st.init = true; }
   };
   resize();
@@ -191,8 +195,10 @@ export function createGallery(canvas, items, { onActive, onHover, onOpen, mobile
     if (h) onOpen && onOpen(h.i);
     else if (mobile && st.active >= 0) onOpen && onOpen(st.active);
   };
-  canvas.addEventListener('pointermove', onMove, { passive: true });
-  canvas.addEventListener('pointerleave', onLeave);
+  if (!mobile) {
+    canvas.addEventListener('pointermove', onMove, { passive: true });
+    canvas.addEventListener('pointerleave', onLeave);
+  }
   canvas.addEventListener('click', onClick);
 
   const io = new IntersectionObserver(([e]) => {
@@ -240,7 +246,8 @@ export function createGallery(canvas, items, { onActive, onHover, onOpen, mobile
     st.x += (tx - st.x) * k(4);
     st.y += (ty - st.y) * k(4);
     const instVel = (prevZ - st.z) / Math.max(dt, 0.001); // units / s, + when flying forward
-    st.vel += (clamp(instVel * 0.045, -1.6, 1.6) - st.vel) * k(8);
+    const vmax = mobile ? 0.4 : 1.3;
+    st.vel += (clamp(instVel * 0.045, -vmax, vmax) - st.vel) * k(8);
 
     st.mxs += (st.mx - st.mxs) * k(3);
     st.mys += (st.my - st.mys) * k(3);
@@ -263,7 +270,7 @@ export function createGallery(canvas, items, { onActive, onHover, onOpen, mobile
       p.group.position.y = Math.cos(i * 1.3) * 1.1 + Math.sin(t * 0.6 + i) * 0.08;
     });
 
-    dust.material.size = 0.07 + Math.abs(st.vel) * 0.06;
+    dust.material.size = 1.7 + Math.min(1, Math.abs(st.vel)) * 1.2;
     renderer.render(scene, camera);
     st.raf = requestAnimationFrame(frame);
   }
