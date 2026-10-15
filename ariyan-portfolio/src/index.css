@@ -446,22 +446,22 @@ html.invert .case__meta, html.invert .case__nav { --line: rgba(236, 232, 224, 0.
 @keyframes float { 50% { transform: translate(-14px, -16px); } }
 
 /* ───────────────────────── Log ───────────────────────── */
-.log { background: var(--ink); color: var(--bone); padding: clamp(5rem, 10vw, 10rem) var(--pad); position: relative; z-index: 2; }
-.log .mf__idx { color: var(--bone); }
+.log { background: var(--bone); color: var(--ink); padding: clamp(5rem, 10vw, 10rem) var(--pad); position: relative; z-index: 2; }
+.log .mf__idx { color: var(--ink); }
 .log__head { margin-bottom: clamp(2rem, 5vw, 5rem); }
 .log__cmd { margin-top: 2rem; font: 400 0.9rem var(--mono); color: var(--mute); }
 .log__cmd b { color: var(--sig); margin-right: 0.6rem; font-weight: 500; }
 .log__list { position: relative; --rail: 12.5rem; }
-.log__rail { position: absolute; left: calc(var(--rail) + 1.1rem - 1px); top: 0; bottom: 0; width: 2px; background: rgba(236, 232, 224, 0.15); }
+.log__rail { position: absolute; left: calc(var(--rail) + 1.1rem - 1px); top: 0; bottom: 0; width: 2px; background: rgba(12, 12, 11, 0.15); }
 .log__rail i { position: absolute; inset: 0; background: var(--sig); transform: scaleY(0); }
 .log__item { position: relative; display: grid; grid-template-columns: var(--rail) 2.2rem minmax(0, 1fr); gap: 1rem; padding-bottom: clamp(2.2rem, 5vw, 4.5rem); }
 .log__hash { text-align: right; display: grid; gap: 0.5rem; justify-items: end; align-content: start; padding-top: 0.35rem; font: 400 0.8rem var(--mono); }
 .log__hash code { color: var(--sig); font-size: 0.9rem; }
 .log__ref { padding: 0.2rem 0.5rem; border: 1px solid var(--sig); border-radius: 4px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--sig); }
-.log__ref.is-tag { border-color: rgba(236, 232, 224, 0.35); color: rgba(236, 232, 224, 0.7); }
-.log__node { grid-column: 2; grid-row: 1; justify-self: center; margin-top: 0.55rem; width: 14px; height: 14px; border-radius: 50%; background: var(--ink); border: 2px solid var(--sig); position: relative; z-index: 2; }
+.log__ref.is-tag { border-color: rgba(12, 12, 11, 0.35); color: rgba(12, 12, 11, 0.7); }
+.log__node { grid-column: 2; grid-row: 1; justify-self: center; margin-top: 0.55rem; width: 14px; height: 14px; border-radius: 50%; background: var(--bone); border: 2px solid var(--sig); position: relative; z-index: 2; }
 .log__item:first-of-type .log__node, .log__item:nth-child(2) .log__node { background: var(--sig); }
-.log__item.is-edu .log__node { border-radius: 2px; border-color: var(--bone); }
+.log__item.is-edu .log__node { border-radius: 2px; border-color: var(--ink); }
 .log__card { grid-column: 3; display: grid; gap: 0.5rem; max-width: 46rem; }
 .log__date { font: 400 0.84rem var(--mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--mute); }
 .log__card h3 { font: 700 clamp(1.8rem, 4.2vw, 4rem)/0.98 var(--display); letter-spacing: -0.05em; }

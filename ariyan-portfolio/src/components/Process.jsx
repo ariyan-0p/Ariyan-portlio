@@ -83,7 +83,7 @@ export default function Process() {
   return (
     <section id="process" ref={root} className="prc">
       <div className="prc__head">
-        <div className="mf__idx"><span>(01)</span><span>Process</span></div>
+        <div className="mf__idx"><span>(03)</span><span>Process</span></div>
         <h2 className="wk__title" aria-label="From blank page to live">
           <span className="line">{split('BLANK PAGE')}</span>
           <span className="line line--r">{split('TO LIVE')}</span>

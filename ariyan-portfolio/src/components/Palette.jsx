@@ -13,6 +13,7 @@ export default function Palette({ open, onClose, onOpenProject }) {
     const nav = [
       ['goto work', 'Jump to selected work', () => goTo('work')],
       ['goto capabilities', 'What I build with', () => goTo('capabilities')],
+      ['goto process', 'How I work', () => goTo('process')],
       ['goto log', 'git log — experience', () => goTo('log')],
       ['goto contact', 'Start a project', () => goTo('contact')],
     ];

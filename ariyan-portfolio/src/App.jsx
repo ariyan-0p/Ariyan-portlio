@@ -52,9 +52,9 @@ export default function App() {
       <main>
         <Hero ready={ready} onPalette={() => setPalette(true)} />
         <Marquee />
-        <Process />
-        <Manifesto />
         <Work openSlug={openSlug} setOpenSlug={setOpenSlug} />
+        <Manifesto />
+        <Process />
         <Log />
         <Contact />
       </main>
