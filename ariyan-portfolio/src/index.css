@@ -80,7 +80,7 @@ html.has-cursor .cursor-dot, html.has-cursor .cursor-ring { display: block; }
 
 /* ───────────────────────── Loader (terminal) ───────────────────────── */
 .boot { position: fixed; inset: 0; z-index: 400; background: #070908; color: var(--bone); font-family: var(--mono); overflow: hidden; }
-.boot__crt { position: absolute; inset: 0; background: #070908; }
+.boot__crt { position: absolute; inset: 0; }
 .boot__scan { position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px); mix-blend-mode: multiply; animation: crtflick 0.18s steps(2) infinite; }
 .boot__scan::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.55) 100%); }
 @keyframes crtflick { 50% { opacity: 0.88; } }

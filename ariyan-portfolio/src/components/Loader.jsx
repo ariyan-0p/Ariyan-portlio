@@ -31,6 +31,7 @@ function hexLine(n) {
 export default function Loader({ onWarm, cloudReady, onReveal, onDone }) {
   const root = useRef(null);
   const crt = useRef(null);
+  const term = useRef(null);
   const main = useRef(null);
   const hex = useRef(null);
   const files = useRef(null);
@@ -128,19 +129,31 @@ export default function Loader({ onWarm, cloudReady, onReveal, onDone }) {
       gsap.fromTo(G, { opacity: 0 }, { opacity: 1, duration: 0.12 });
       await scramble(big, 'ACCESS GRANTED', fast ? 120 : 650);
       if (dead) return;
-      await sleep(fast ? 300 : 520);
+      await sleep(fast ? 200 : 380);
       if (dead) return;
-      // wait (briefly) until the hero's particle cloud exists — it is already showing the same words beneath us
+      // let the hero's particle cloud finish building (it is already waiting beneath as a spinning galaxy)
       const t0 = performance.now();
       while (!dead && cloudReady && !cloudReady() && performance.now() - t0 < 4000) await new Promise((r) => setTimeout(r, 50));
       if (dead) return;
-      // glitch, then the words hand over to particles that shatter and re-form as the homepage
+
+      // the terminal window shrinks and flies into the "AS" badge in the nav
+      const logo = document.querySelector('.nav__logo');
+      const lr = logo ? logo.getBoundingClientRect() : { left: 34, top: 18, width: 32, height: 32 };
+      const T = term.current.getBoundingClientRect();
+      const dx = lr.left + lr.width / 2 - (T.left + T.width / 2);
+      const dy = lr.top + lr.height / 2 - (T.top + T.height / 2);
+      const scan = root.current.querySelector('.boot__scan');
+
       const tl = gsap.timeline({ onComplete: () => { root.current.style.display = 'none'; if (onDone) onDone(); } });
-      tl.to(crt.current, { x: () => (Math.random() - 0.5) * 26, skewX: 5, filter: 'hue-rotate(40deg) saturate(2)', duration: 0.05, repeat: 5, yoyo: true, ease: 'none' });
+      tl.to(crt.current, { x: () => (Math.random() - 0.5) * 22, skewX: 4, filter: 'hue-rotate(40deg) saturate(2)', duration: 0.05, repeat: 3, yoyo: true, ease: 'none' });
       tl.set(crt.current, { x: 0, skewX: 0, filter: 'none' });
       tl.add(() => { if (onReveal) onReveal(); });
       tl.to(grant.current, { opacity: 0, duration: 0.18, ease: 'none' }, '<');
-      tl.to(crt.current, { opacity: 0, duration: 0.3, ease: 'power1.out' }, '<');
+      tl.to(term.current, { x: dx, y: dy, scaleX: lr.width / T.width, scaleY: lr.height / T.height, duration: 0.95, ease: 'expo.inOut', transformOrigin: '50% 50%' }, '<');
+      tl.to(root.current, { backgroundColor: 'rgba(7, 9, 8, 0)', duration: 0.75, ease: 'power2.inOut' }, '<0.1');
+      tl.to(scan, { opacity: 0, duration: 0.5 }, '<');
+      tl.to(term.current, { opacity: 0, duration: 0.18, ease: 'none' }, '-=0.2');
+      tl.fromTo('.nav__logo', { scale: 1.8 }, { scale: 1, duration: 0.8, ease: 'elastic.out(1, 0.45)' }, '-=0.12');
     }
 
     async function run() {
@@ -217,7 +230,7 @@ export default function Loader({ onWarm, cloudReady, onReveal, onDone }) {
   return (
     <div ref={root} className="boot" aria-hidden="true">
       <div ref={crt} className="boot__crt">
-        <div className="term">
+        <div ref={term} className="term">
           <div className="term__bar">
             <i /><i /><i />
             <span>visitor@ariyansamal.dev — zsh — 120×36</span>

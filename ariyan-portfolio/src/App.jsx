@@ -45,7 +45,7 @@ export default function App() {
     unlockScroll();
     if (reduceMotion()) return;
     // everything else slides in as the tiles open
-    gsap.from('.nav > *', { y: -34, opacity: 0, duration: 1.1, stagger: 0.09, ease: 'expo.out', delay: 0.5 });
+    gsap.from('.nav > *', { y: -34, opacity: 0, duration: 1.1, stagger: 0.09, ease: 'expo.out', delay: 0.75 });
     gsap.from('.ruler', { x: 40, opacity: 0, duration: 1.2, ease: 'expo.out', delay: 1.1 });
   }, []);
   const onDone = useCallback(() => {

@@ -21,6 +21,13 @@ vec3 pickCol(int i) { if (i == 0) return aColA; if (i == 1) return aColB; if (i 
 
 void main() {
   vec3 pf = pick(uFrom);
+  if (uFrom == 3) {
+    float rr = length(pf.xy);
+    float ang = uTime * (1.1 / (0.5 + rr * 0.18));
+    float cs = cos(ang);
+    float sn = sin(ang);
+    pf.xy = vec2(cs * pf.x - sn * pf.y, sn * pf.x + cs * pf.y);
+  }
   vec3 pt = pick(uTo);
   float t = clamp(uMorph * 1.75 - aRand.w * 0.75, 0.0, 1.0);
   float e = t * t * (3.0 - 2.0 * t);
@@ -199,6 +206,25 @@ function faceTarget(img, W, H, N) {
 
 // ── public API ───────────────────────────────────────────────────
 
+function spiralTarget(N, W, H) {
+  const pos = new Float32Array(N * 3);
+  const col = new Float32Array(N * 3);
+  const R = Math.max(W, H) * 0.62;
+  for (let i = 0; i < N; i++) {
+    const t = Math.pow(Math.random(), 0.65);
+    const r = 0.8 + t * R;
+    const arm = (i % 3) * ((Math.PI * 2) / 3);
+    const th = r * 0.42 + arm + (Math.random() - 0.5) * (0.25 + t * 0.5);
+    pos[i * 3] = Math.cos(th) * r;
+    pos[i * 3 + 1] = Math.sin(th) * r * 0.6;
+    pos[i * 3 + 2] = (Math.random() - 0.5) * (2.4 - t * 1.6);
+    const c = Math.random() < 0.3 + t * 0.35 ? ORANGE : BONE;
+    const v = (1 - t * 0.55) * (0.6 + Math.random() * 0.4);
+    col[i * 3] = c[0] * v; col[i * 3 + 1] = c[1] * v; col[i * 3 + 2] = c[2] * v;
+  }
+  return { pos, col };
+}
+
 export async function createHeroParticles(canvas, { photo, mobile, onStage }) {
   let renderer;
   try {
@@ -253,7 +279,7 @@ export async function createHeroParticles(canvas, { photo, mobile, onStage }) {
       : textTarget(['ARIYAN SAMAL'], { weight: 800, family: '"Inter Tight", sans-serif', lh: 0.9, dy: 0.02 }, W, H, 0.9, 0.46, N, 0.5);
     const code = textTarget(['</>'], { weight: 500, family: '"JetBrains Mono", monospace', lh: 1 }, W, H, tall ? 0.9 : 0.62, tall ? 0.3 : 0.55, N, 1.4);
     const face = faceTarget(img, W, H, N);
-    const access = textTarget(['ACCESS GRANTED'], { weight: 800, family: '"Inter Tight", sans-serif', lh: 0.9, dy: 0.02 }, W, H, tall ? 0.9 : 0.79, 0.3, N, 0.3, true);
+    const access = spiralTarget(N, W, H);
     A.aA.array.set(name.pos); A.aColA.array.set(name.col);
     A.aB.array.set(face.pos); A.aColB.array.set(face.col); A.aReal.array.set(face.real);
     A.aC.array.set(code.pos); A.aColC.array.set(code.col);
