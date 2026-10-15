@@ -9,7 +9,7 @@ attribute vec3 aA; attribute vec3 aB; attribute vec3 aC; attribute vec3 aD;
 attribute vec3 aColA; attribute vec3 aColB; attribute vec3 aColC; attribute vec3 aColD;
 attribute vec3 aReal;
 attribute vec4 aRand;
-uniform float uTime, uMorph, uPixel, uSize, uDisperse, uShockT, uSpin, uTension, uShockAmp, uW;
+uniform float uTime, uMorph, uPixel, uSize, uDisperse, uShockT, uSpin, uTension, uShockAmp, uW, uH;
 uniform vec2 uShockP;
 uniform int uFrom, uTo;
 uniform vec3 uTrail[12];
@@ -43,25 +43,33 @@ void main() {
   float bell;
   float sing = 0.0;
   float flare = 0.0;
+  float boom = 0.0;
   vec3 p;
 
   if (intro) {
     float m = uMorph;
-    // A — every particle is dragged into one spinning singularity
-    float a = clamp(m / 0.42, 0.0, 1.0);
+    // A - the galaxy is dragged into one spinning point, in place (as before)
+    float a = clamp(m / 0.30, 0.0, 1.0);
     float ea = a * a * (3.0 - 2.0 * a);
-    vec3 pa = mix(pf, vec3(pf.xy * 0.035, pf.z * 0.15), ea);
+    vec3 pa = mix(pf, vec3(pf.xy * 0.07, pf.z * 0.2), ea);
     pa.xy = rot(pa.xy, 3.4 * ea * (1.0 - 0.5 * rad));
-    // B — it detonates and rebuilds the name as a wave sweeping left to right
+    // B - it detonates: every particle is thrown out and spreads across the whole page
+    float bl = clamp((m - 0.30) / 0.18, 0.0, 1.0);
+    float ebl = 1.0 - pow(1.0 - bl, 4.0);
+    vec3 spread = vec3((aRand.x - 0.5) * uW * 1.3, (aRand.y - 0.5) * uH * 1.3, (aRand.z - 0.5) * 8.0);
+    vec3 pb = mix(pa, spread, ebl);
+    pb.xy = rot(pb.xy, 0.4 * smoothstep(0.3, 0.6, m));          // a slow swirl while it hangs there
+    // C - then the spread cloud is pulled together and rebuilds the name, left to right
     float dx = clamp(pt.x / uW + 0.5, 0.0, 1.0);
-    float b = clamp((m - 0.34 - dx * 0.38) / 0.28, 0.0, 1.0);
+    float b = clamp((m - 0.56 - dx * 0.2) / 0.24, 0.0, 1.0);
     float eb = 1.0 - pow(1.0 - b, 3.0);
-    p = mix(pa, pt, eb);
+    p = mix(pb, pt, eb);
     p.xy = rot(p.xy, 1.9 * sin(3.14159265 * b) * (1.0 - rad * 0.4));
     t = b;
     e = eb;
     bell = sin(3.14159265 * b) * 0.4;
-    sing = ea * (1.0 - smoothstep(0.0, 0.7, b));
+    sing = ea * (1.0 - smoothstep(0.0, 0.25, bl));
+    boom = step(0.30, m) * exp(-(m - 0.30) * 14.0);
     flare = sin(3.14159265 * clamp((b - 0.5) / 0.5, 0.0, 1.0));
   } else {
     t = clamp(uMorph * 1.75 - aRand.w * 0.75, 0.0, 1.0);
@@ -105,7 +113,7 @@ void main() {
   gl_Position = projectionMatrix * mv;
   float gx = intro ? (1.0 - e) : 0.0;   // 1 while still part of the galaxy, 0 once landed
   float tw = 0.78 + 0.22 * sin(uTime * 2.0 + aRand.x * 30.0);
-  gl_PointSize = uSize * uPixel * (0.8 + aRand.y * 0.9) * tw * (22.0 / -mv.z) * (1.0 + lens * 0.8) * (1.0 + 0.55 * gx + 0.9 * sing);
+  gl_PointSize = uSize * uPixel * (0.8 + aRand.y * 0.9) * tw * (22.0 / -mv.z) * (1.0 + lens * 0.8) * (1.0 + 0.55 * gx + 0.25 * sing);
 
   vec3 col = mix(pickCol(uFrom), pickCol(uTo), e);
   float faceW = (uFrom == 1 ? 1.0 - e : 0.0) + (uTo == 1 ? e : 0.0);
@@ -114,8 +122,9 @@ void main() {
   col *= 1.0 + uTension * 0.8 * gx;
   col += vec3(1.0, 0.22, 0.14) * sing * 0.8;        // the singularity burns red, not white
   col += vec3(1.0, 0.32, 0.22) * flare * 1.0;       // each particle flares red-hot as it locks in
+  col += vec3(1.0, 0.5, 0.3) * boom * 1.0;          // white-hot flash at the instant of the blast
   vCol = col;
-  vAlpha = (1.0 - uDisperse) * (0.34 + 0.4 * aRand.w) * (1.0 + 0.9 * gx) * (1.0 - 0.7 * sing);
+  vAlpha = (1.0 - uDisperse) * (0.34 + 0.4 * aRand.w) * (1.0 + 0.9 * gx) * (1.0 - 0.88 * sing);
 }`;
 
 const FRAG = /* glsl */ `
@@ -337,7 +346,7 @@ export async function createHeroParticles(canvas, { photo, mobile, onStage }) {
     const asp = w / h;
     H = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
     W = H * asp;
-    if (typeof mat !== 'undefined') mat.uniforms.uW.value = W;
+    if (typeof mat !== 'undefined') { mat.uniforms.uW.value = W; mat.uniforms.uH.value = H; }
     const tall = asp < 1.05;
     const name = tall
       ? textTarget(['ARIYAN', 'SAMAL'], { weight: 800, family: '"Inter Tight", sans-serif', lh: 0.84, dy: 0.02 }, W, H, 0.9, 0.5, N, 0.5, 'red')
@@ -362,7 +371,7 @@ export async function createHeroParticles(canvas, { photo, mobile, onStage }) {
     blending: THREE.AdditiveBlending,
     uniforms: {
       uTime: { value: 0 }, uMorph: { value: 0 }, uPixel: { value: dpr }, uSize: { value: mobile ? 2.0 : 1.7 },
-      uDisperse: { value: 0 }, uShockT: { value: 0 }, uSpin: { value: 0 }, uTension: { value: 0 }, uShockAmp: { value: 1 }, uW: { value: 22 }, uShockP: { value: new THREE.Vector2() },
+      uDisperse: { value: 0 }, uShockT: { value: 0 }, uSpin: { value: 0 }, uTension: { value: 0 }, uShockAmp: { value: 1 }, uW: { value: 22 }, uH: { value: 13.9 }, uShockP: { value: new THREE.Vector2() },
       uFrom: { value: 3 }, uTo: { value: 0 }, uTrail: { value: trailU },
     },
   });
@@ -402,7 +411,7 @@ export async function createHeroParticles(canvas, { photo, mobile, onStage }) {
   const goTo = (i, manual) => {
     if (i === S.stage && S.morph >= 1) return;
     S.from = S.morph >= 1 ? (S.stage < 0 ? 3 : S.stage) : S.to;
-    S.dur = S.from === 3 ? 2.3 : 2.6;
+    S.dur = S.from === 3 ? 3.6 : 2.6;
     S.to = i;
     S.stage = i;
     S.morph = 0;
@@ -483,7 +492,7 @@ export async function createHeroParticles(canvas, { photo, mobile, onStage }) {
     u.uSpin.value = S.spin;
     u.uTension.value = tension;
     // the singularity trembles just before it detonates
-    const shake = S.started && S.from === 3 && S.morph < 0.5 ? Math.sin((Math.PI * Math.min(1, S.morph / 0.42))) * 0.22 : 0;
+    const shake = S.started && S.from === 3 && S.morph < 0.3 ? Math.sin(Math.PI * Math.min(1, S.morph / 0.3)) * 0.22 : 0;
     points.position.set((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake, 0);
 
     if (S.started) {
@@ -529,7 +538,10 @@ export async function createHeroParticles(canvas, { photo, mobile, onStage }) {
         S.started = true;
         goTo(0, false);
         // crisp ring right as the letters lock into place
-        setTimeout(() => { if (!S.dead) { mat.uniforms.uShockAmp.value = 0.28; mat.uniforms.uShockP.value.set(0, 0); S.shock = 0; } }, 2000);
+        // the blast: a full-strength ring right as the point detonates
+        setTimeout(() => { if (!S.dead) { mat.uniforms.uShockAmp.value = 1; mat.uniforms.uShockP.value.set(0, 0); S.shock = 0; } }, 1080);
+        // and a gentle ripple as the last letters lock in
+        setTimeout(() => { if (!S.dead) { mat.uniforms.uShockAmp.value = 0.28; mat.uniforms.uShockP.value.set(0, 0); S.shock = 0; } }, 3350);
       }, delay * 1000);
     },
     goTo(i) { clearTimeout(S.pending); S.pending = 0; S.revealAt = 0; S.started = true; goTo(i, true); },
