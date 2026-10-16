@@ -121,6 +121,109 @@ export default function Loader({ onWarm, cloudReady, onReveal, onDone }) {
       step();
     });
 
+    // The whole screen cracks into glass shards (live copies of the terminal, clipped to triangles)
+    // that fly toward the viewer in 3D, while a flash, a screen shake and a shockwave through the
+    // particle galaxy hit at the same instant.
+    function shatter() {
+      return new Promise((resolve) => {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const finish = () => { root.current.style.display = 'none'; if (onDone) onDone(); resolve(); };
+        if (reduceMotion()) {
+          if (onReveal) onReveal();
+          gsap.to(root.current, { opacity: 0, duration: 0.4, onComplete: finish });
+          return;
+        }
+        if (/[?&]slow=1/.test(window.location.search)) gsap.globalTimeline.timeScale(0.12); // debugging aid: watch the break in slow motion
+        const BG = '#070908';
+        const cols = vw < 700 ? 4 : 7;
+        const rows = vw < 700 ? 6 : 4;
+        // jittered grid of points (the border stays straight so the shards tile the whole screen)
+        const pt = [];
+        for (let j = 0; j <= rows; j++) {
+          pt[j] = [];
+          for (let i = 0; i <= cols; i++) {
+            const edge = i === 0 || j === 0 || i === cols || j === rows;
+            const jx = edge ? 0 : (Math.random() - 0.5) * (vw / cols) * 0.7;
+            const jy = edge ? 0 : (Math.random() - 0.5) * (vh / rows) * 0.7;
+            // keep the outer edge exactly on the screen edge
+            pt[j][i] = [(i / cols) * vw + (i === 0 || i === cols ? 0 : jx), (j / rows) * vh + (j === 0 || j === rows ? 0 : jy)];
+          }
+        }
+        const tris = [];
+        for (let j = 0; j < rows; j++) {
+          for (let i = 0; i < cols; i++) {
+            const a = pt[j][i], b = pt[j][i + 1], c = pt[j + 1][i + 1], d = pt[j + 1][i];
+            if (Math.random() < 0.5) { tris.push([a, b, c]); tris.push([a, c, d]); } else { tris.push([a, b, d]); tris.push([b, c, d]); }
+          }
+        }
+
+        const layer = document.createElement('div');
+        layer.className = 'boot__shards';
+        root.current.appendChild(layer);
+        const source = crt.current;
+        const shards = tris.map((t) => {
+          const xs = t.map((p) => p[0]);
+          const ys = t.map((p) => p[1]);
+          const bx = Math.min(...xs), by = Math.min(...ys);
+          const bw = Math.max(...xs) - bx, bh = Math.max(...ys) - by;
+          const el = document.createElement('div');
+          el.className = 'boot__shard';
+          el.style.cssText = `left:${bx}px;top:${by}px;width:${bw}px;height:${bh}px;background:${BG};clip-path:polygon(${t.map((p) => `${p[0] - bx}px ${p[1] - by}px`).join(',')});`;
+          const inner = source.cloneNode(true);
+          inner.removeAttribute('class');
+          inner.style.cssText = `position:absolute;left:${-bx}px;top:${-by}px;width:${vw}px;height:${vh}px;`;
+          el.appendChild(inner);
+          const shine = document.createElement('i');
+          shine.className = 'boot__shine';
+          el.appendChild(shine);
+          layer.appendChild(el);
+          const mx = (t[0][0] + t[1][0] + t[2][0]) / 3;
+          const my = (t[0][1] + t[1][1] + t[2][1]) / 3;
+          el.style.transformOrigin = `${mx - bx}px ${my - by}px`;
+          return { el, mx, my };
+        });
+
+        // the original screen is replaced by its shards; the galaxy underneath is now visible between them
+        source.style.visibility = 'hidden';
+        root.current.style.background = 'transparent';
+
+        const flash = document.createElement('div');
+        flash.className = 'boot__flash';
+        layer.appendChild(flash);
+        gsap.fromTo(flash, { opacity: 0.7 }, { opacity: 0, duration: 0.45, ease: 'power2.out' });
+
+        // impact: page shake + shockwave through the galaxy + the rest of the site starts to come in
+        const main = document.querySelector('main');
+        if (main) gsap.fromTo(main, { x: 0, y: 0 }, { x: () => (Math.random() - 0.5) * 18, y: () => (Math.random() - 0.5) * 14, duration: 0.04, repeat: 11, yoyo: true, ease: 'none', onComplete: () => gsap.set(main, { x: 0, y: 0 }) });
+        window.dispatchEvent(new CustomEvent('hero:impact'));
+        if (onReveal) onReveal();
+
+        const cx = vw / 2;
+        const cy = vh / 2;
+        const maxD = Math.hypot(cx, cy);
+        const k = fast ? 0.7 : 1;
+        let left = shards.length;
+        shards.forEach(({ el, mx, my }) => {
+          const dx = mx - cx;
+          const dy = my - cy;
+          const d = Math.hypot(dx, dy) || 1;
+          const fly = (420 + Math.random() * 900) * (0.55 + d / maxD);
+          gsap.to(el, {
+            x: (dx / d) * fly, y: (dy / d) * fly + (Math.random() - 0.3) * 160,
+            z: 250 + Math.random() * 1000,
+            rotationX: (Math.random() - 0.5) * 700, rotationY: (Math.random() - 0.5) * 700, rotationZ: (Math.random() - 0.5) * 420,
+            scale: 0.4 + Math.random() * 0.9,
+            opacity: 0,
+            duration: (1.15 + Math.random() * 0.9) * k,
+            delay: 0.1 + (d / maxD) * 0.28 + Math.random() * 0.08,
+            ease: 'power3.out',
+            onComplete: () => { left -= 1; if (left === 0) { layer.remove(); finish(); } },
+          });
+        });
+      });
+    }
+
     async function access() {
       clearInterval(hexTimer);
       const G = grant.current;
@@ -136,24 +239,14 @@ export default function Loader({ onWarm, cloudReady, onReveal, onDone }) {
       while (!dead && cloudReady && !cloudReady() && performance.now() - t0 < 4000) await new Promise((r) => setTimeout(r, 50));
       if (dead) return;
 
-      // the terminal window shrinks and flies into the "AS" badge in the nav
-      const logo = document.querySelector('.nav__logo');
-      const lr = logo ? logo.getBoundingClientRect() : { left: 34, top: 18, width: 32, height: 32 };
-      const T = term.current.getBoundingClientRect();
-      const dx = lr.left + lr.width / 2 - (T.left + T.width / 2);
-      const dy = lr.top + lr.height / 2 - (T.top + T.height / 2);
-      const scan = root.current.querySelector('.boot__scan');
-
-      const tl = gsap.timeline({ onComplete: () => { root.current.style.display = 'none'; if (onDone) onDone(); } });
-      tl.to(crt.current, { x: () => (Math.random() - 0.5) * 22, skewX: 4, filter: 'hue-rotate(40deg) saturate(2)', duration: 0.05, repeat: 3, yoyo: true, ease: 'none' });
-      tl.set(crt.current, { x: 0, skewX: 0, filter: 'none' });
-      tl.add(() => { if (onReveal) onReveal(); });
-      tl.to(grant.current, { opacity: 0, duration: 0.18, ease: 'none' }, '<');
-      tl.to(term.current, { x: dx, y: dy, scaleX: lr.width / T.width, scaleY: lr.height / T.height, duration: 0.95, ease: 'expo.inOut', transformOrigin: '50% 50%' }, '<');
-      tl.to(root.current, { backgroundColor: 'rgba(7, 9, 8, 0)', duration: 0.75, ease: 'power2.inOut' }, '<0.1');
-      tl.to(scan, { opacity: 0, duration: 0.5 }, '<');
-      tl.to(term.current, { opacity: 0, duration: 0.18, ease: 'none' }, '-=0.2');
-      tl.fromTo('.nav__logo', { scale: 1.8 }, { scale: 1, duration: 0.8, ease: 'elastic.out(1, 0.45)' }, '-=0.12');
+      // a short glitch, then the whole screen breaks
+      await new Promise((res) => {
+        gsap.timeline({ onComplete: res })
+          .to(crt.current, { x: () => (Math.random() - 0.5) * 26, skewX: 5, filter: 'hue-rotate(40deg) saturate(2)', duration: 0.045, repeat: 7, yoyo: true, ease: 'none' })
+          .set(crt.current, { x: 0, skewX: 0, filter: 'none' });
+      });
+      if (dead) return;
+      await shatter();
     }
 
     async function run() {

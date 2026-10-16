@@ -28,10 +28,18 @@ export default function Hero({ warm, ready, onPalette, onCloud }) {
     if (api.current) api.current.reveal(reduceMotion() ? 0.2 : 3.4);
     const ctx = gsap.context(() => {
       const fast = reduceMotion();
+      gsap.fromTo('.hero__canvas', { scale: 1.35, opacity: 0.2 }, { scale: 1, opacity: 1, duration: fast ? 0.01 : 2.2, ease: 'expo.out' });
       gsap.from('.hero__fade', { opacity: 0, y: 26, duration: fast ? 0.01 : 1, stagger: 0.1, ease: 'expo.out', delay: 1.6 });
     }, root);
     return () => ctx.revert();
   }, [ready]);
+
+  // the preloader's screen shatters: send a full-strength shockwave through the cloud
+  useEffect(() => {
+    const hit = () => { if (api.current) api.current.shock(0, 0, 1); };
+    window.addEventListener('hero:impact', hit);
+    return () => window.removeEventListener('hero:impact', hit);
+  }, []);
 
   // scroll: the cloud disperses
   useEffect(() => {

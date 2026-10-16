@@ -545,7 +545,7 @@ export async function createHeroParticles(canvas, { photo, mobile, onStage }) {
       }, delay * 1000);
     },
     goTo(i) { clearTimeout(S.pending); S.pending = 0; S.revealAt = 0; S.started = true; goTo(i, true); },
-    shock(x = 0, y = 0) { mat.uniforms.uShockP.value.set(x, y); S.shock = 0; },
+    shock(x = 0, y = 0, amp = 1) { mat.uniforms.uShockAmp.value = amp; mat.uniforms.uShockP.value.set(x, y); S.shock = 0; },
     setDisperse(v) { S.disperse = v; },
     destroy() {
       S.dead = true;

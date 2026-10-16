@@ -664,3 +664,9 @@ html.invert .case__meta, html.invert .case__nav { --line: rgba(236, 232, 224, 0.
 /* iOS: the pinned scenes are pinned in JS (see lib/scroll.js), so the CSS sticky is switched off */
 .ios .gal__stage, .ios .mf__stage, .ios .lg__stage { position: relative; top: auto; }
 .ios .prc__card { position: relative; top: auto; }
+
+/* ───────────────────────── Preloader: shatter ───────────────────────── */
+.boot__shards { position: absolute; inset: 0; perspective: 1100px; perspective-origin: 50% 50%; pointer-events: none; z-index: 5; }
+.boot__shard { position: absolute; will-change: transform, opacity; transform-style: preserve-3d; overflow: hidden; backface-visibility: visible; }
+.boot__shine { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 45%, rgba(255, 77, 31, 0.1)); pointer-events: none; }
+.boot__flash { position: absolute; inset: 0; background: #fff; pointer-events: none; mix-blend-mode: screen; }
