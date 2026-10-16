@@ -347,7 +347,7 @@ export default function Loader({ onWarm, cloudReady, onReveal, onDone }) {
 
         <div ref={grant} className="boot__grant">
           <div className="g-big">ACCESS GRANTED</div>
-          <div className="g-sub">welcome, visitor</div>
+          <div className="g-sub">welcome</div>
         </div>
         <div className="boot__scan" />
       </div>
