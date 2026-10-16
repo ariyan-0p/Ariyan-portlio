@@ -11,7 +11,7 @@ export default function Palette({ open, onClose, onOpenProject }) {
 
   const cmds = useMemo(() => {
     const nav = [
-      ['goto work', 'Jump to selected work', () => goTo('work')],
+      ['goto work', 'Jump to my projects', () => goTo('work')],
       ['goto capabilities', 'What I build with', () => goTo('capabilities')],
       ['goto process', 'How I work', () => goTo('process')],
       ['goto log', 'git log — experience', () => goTo('log')],

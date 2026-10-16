@@ -69,10 +69,10 @@ export default function Work({ openSlug, setOpenSlug }) {
   return (
     <section id="work" ref={root} className={`wk ${mode === 'fly' ? 'has-gal' : ''}`}>
       <div className="wk__head">
-        <div className="mf__idx"><span>(01)</span><span>Selected work</span></div>
-        <h2 className="wk__title" aria-label="Work">
-          <span className="line">{split('SELECTED')}</span>
-          <span className="line line--r">{split('WORK')}<sup>{String(PROJECTS.length).padStart(2, '0')}</sup></span>
+        <div className="mf__idx"><span>(01)</span><span>Portfolio</span></div>
+        <h2 className="wk__title" aria-label="Things I shipped">
+          <span className="line">{split('THINGS I')}</span>
+          <span className="line line--r">{split('SHIPPED')}<sup>{String(PROJECTS.length).padStart(2, '0')}</sup></span>
         </h2>
         <div className="wk__bar2">
         <div className="wk__mode" role="tablist" aria-label="View">

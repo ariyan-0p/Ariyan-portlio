@@ -597,7 +597,9 @@ html.invert .case__meta, html.invert .case__nav { --line: rgba(236, 232, 224, 0.
   .lg__right { order: 1; align-items: stretch; }
   .lg__graph { display: none; }
   .lg__meta { margin-bottom: 0; }
-  .lg__body { min-height: 0; }
+  .lg__oneline { display: none; }          /* the commit text needs the room; scrolling + the n/6 counter do the navigating */
+  .lg__body { min-height: 0; flex: 1 1 auto; overflow: auto; }
+  .lg__term { height: 100%; }
   .ct__grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 520px) {
@@ -662,3 +664,12 @@ html.invert .case__meta, html.invert .case__nav { --line: rgba(236, 232, 224, 0.
 .boot__shard { position: absolute; will-change: transform, opacity; transform-style: preserve-3d; overflow: hidden; backface-visibility: visible; }
 .boot__shine { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 45%, rgba(255, 77, 31, 0.1)); pointer-events: none; }
 .boot__flash { position: absolute; inset: 0; background: #fff; pointer-events: none; mix-blend-mode: screen; }
+
+/* very short phones: give the terminal every spare pixel */
+@media (max-width: 900px) and (max-height: 700px) and (orientation: portrait) {
+  .lg__meta { display: none; }
+  .lg__h { font-size: clamp(1.5rem, 6.4vw, 2rem); }
+  .lg__body { font-size: 0.78rem; line-height: 1.5; padding: 0.8rem 1rem; }
+  .c-role { font-size: 1.15rem; }
+  .c-org { font-size: 1rem; }
+}

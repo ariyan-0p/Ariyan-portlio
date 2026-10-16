@@ -58,7 +58,7 @@ export default function Case({ slug, onClose, onNav }) {
       {p && (
         <>
           <div className="case__top">
-            <span className="case__crumb">Selected work / {p.id} — {String(PROJECTS.length).padStart(2, '0')}</span>
+            <span className="case__crumb">Portfolio / {p.id} — {String(PROJECTS.length).padStart(2, '0')}</span>
             <button className="case__close" onClick={onClose}>Close <kbd>esc</kbd></button>
           </div>
 
