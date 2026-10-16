@@ -194,8 +194,6 @@ html.menu-open .nav__menu span:last-child { transform: translateY(-0.25rem) rota
 .mq__block + .mq__block { margin-top: clamp(2rem, 4vw, 3.4rem); padding-top: clamp(2rem, 4vw, 3.4rem); border-top: 2px solid var(--ink); }
 .mq__head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem 2rem; flex-wrap: wrap; padding: 0 var(--pad) clamp(1rem, 2vw, 1.8rem); }
 .mq__head h2 { font: 800 clamp(2.6rem, 6.4vw, 6.4rem)/0.9 var(--display); letter-spacing: -0.06em; text-transform: uppercase; }
-.mq__head p { font: 500 0.9rem var(--mono); text-transform: uppercase; letter-spacing: 0.06em; max-width: 24rem; text-align: right; }
-.mq__head p b { font-weight: 500; background: var(--ink); color: var(--sig); padding: 0.1rem 0.45rem; border-radius: 4px; margin-right: 0.2rem; }
 .mq__row { overflow: hidden; }
 .mq__track { display: flex; width: max-content; gap: clamp(0.8rem, 1.6vw, 1.4rem); padding-right: clamp(0.8rem, 1.6vw, 1.4rem); will-change: transform; }
 

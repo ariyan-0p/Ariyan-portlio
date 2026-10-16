@@ -53,7 +53,6 @@ export default function Marquee() {
       <div className="mq__block">
         <header className="mq__head">
           <h2>Worked with</h2>
-          <p><b>{PROJECTS.length}</b> brands &amp; counting — real products, live today</p>
         </header>
         <Ticker dir={-1}>
           {clientSet.map((p, i) => (
@@ -68,7 +67,6 @@ export default function Marquee() {
       <div className="mq__block mq__block--tech">
         <header className="mq__head">
           <h2>Built with</h2>
-          <p>The tools I reach for — React to infrastructure</p>
         </header>
         <Ticker dir={1}>
           {techSet.map(([name, path], i) => (
