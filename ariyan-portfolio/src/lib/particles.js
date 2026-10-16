@@ -371,7 +371,7 @@ export async function createHeroParticles(canvas, { photo, mobile, onStage }) {
 
   // The first build is the heavy one (~85k points x 4 forms). Doing it in slices keeps every frame short
   // so the preloader above it keeps animating smoothly.
-  const nextFrame = () => new Promise((r) => requestAnimationFrame(() => r()));
+  function nextFrame() { return new Promise((r) => requestAnimationFrame(() => r())); }
   async function buildSliced() {
     const w = canvas.clientWidth || 1;
     const h = canvas.clientHeight || 1;
