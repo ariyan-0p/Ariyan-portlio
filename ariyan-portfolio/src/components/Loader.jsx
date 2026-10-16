@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { gsap, reduceMotion } from '../lib/scroll';
 import { PROFILE, PROJECTS } from '../data';
-import { markIntroSeen } from '../lib/intro';
 
 // A fake "hack-in" terminal that is secretly doing real work: it preloads the fonts, the portrait
 // and every project screenshot, and reads the visitor's viewport / cores / timezone locally.
@@ -304,7 +303,6 @@ export default function Loader({ onWarm, cloudReady, onReveal, onDone }) {
       add('<span class="t-ok">permission granted</span>');
       await sleep(260);
       if (dead) return;
-      markIntroSeen();
       await access();
     }
 

@@ -674,6 +674,9 @@ html.invert .case__meta, html.invert .case__nav { --line: rgba(236, 232, 224, 0.
   .c-org { font-size: 1rem; }
 }
 
-/* lite mode (switched on automatically after repeated page crashes): no heavy scenes */
-.lite .hero__canvas { display: none; }
-.lite .grain { display: none; }
+
+/* phones: skip the two full-screen blended layers that cost the most to repaint */
+@media (pointer: coarse) {
+  .grain { display: none; }
+  .boot__scan { mix-blend-mode: normal; animation: none; opacity: 0.5; }
+}

@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { startScroll, stopScroll, lockScroll, unlockScroll, gsap, ScrollTrigger, reduceMotion } from './lib/scroll';
 import Loader from './components/Loader';
-import { shouldSkipIntro } from './lib/intro';
-import { isLite } from './lib/health';
 import Nav from './components/Nav';
 import Palette from './components/Palette';
 import Ruler from './components/Ruler';
@@ -16,10 +14,8 @@ import Contact from './components/Contact';
 
 export default function App() {
   const [ready, setReady] = useState(false);
-  const [warm, setWarm] = useState(() => !isLite() && shouldSkipIntro()); // returning visitors: build the cloud straight away
-  useEffect(() => { if (isLite()) document.documentElement.classList.add('lite'); }, []);
+  const [warm, setWarm] = useState(false);
   const cloud = useRef(false);
-  const [skipIntro] = useState(() => isLite() || shouldSkipIntro()); // returning visitors don't get the preloader again
   const [palette, setPalette] = useState(false);
   const [openSlug, setOpenSlug] = useState(null);
 
@@ -54,29 +50,18 @@ export default function App() {
   const onDone = useCallback(() => {
     requestAnimationFrame(() => ScrollTrigger.refresh());
   }, []);
-  // skipping the preloader: build the particle cloud straight away and reveal as soon as it exists
-  useEffect(() => {
-    if (!skipIntro) return undefined;
-    let done = false;
-    const go = () => { if (done) return; done = true; onReveal(); onDone(); };
-    // lite mode has no cloud to wait for; otherwise reveal as soon as the cloud exists (or after a failsafe)
-    const poll = setInterval(() => { if (isLite() || cloud.current) { clearInterval(poll); go(); } }, 60);
-    const failsafe = setTimeout(() => { clearInterval(poll); go(); }, 5000);
-    return () => { clearInterval(poll); clearTimeout(failsafe); };
-  }, [skipIntro, onReveal, onDone]);
-
   const openFromPalette = useCallback((slug) => setTimeout(() => setOpenSlug(slug), 120), []);
 
   return (
     <>
-      {!skipIntro && <Loader onWarm={onWarm} cloudReady={cloudReady} onReveal={onReveal} onDone={onDone} />}
+      <Loader onWarm={onWarm} cloudReady={cloudReady} onReveal={onReveal} onDone={onDone} />
       <div className="grain" aria-hidden="true" />
       <Nav onPalette={() => setPalette(true)} />
       <Ruler />
       <Palette open={palette} onClose={() => setPalette(false)} onOpenProject={openFromPalette} />
 
       <main>
-        <Hero quick={skipIntro} warm={warm} ready={ready} onCloud={onCloud} onPalette={() => setPalette(true)} />
+        <Hero warm={warm} ready={ready} onCloud={onCloud} onPalette={() => setPalette(true)} />
         <Marquee />
         <Work openSlug={openSlug} setOpenSlug={setOpenSlug} />
         <Manifesto />

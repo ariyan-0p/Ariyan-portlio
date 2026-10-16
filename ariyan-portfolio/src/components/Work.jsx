@@ -2,7 +2,6 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } fro
 import { gsap, isTouch, reduceMotion, ScrollTrigger } from '../lib/scroll';
 import { PROJECTS, FILTERS } from '../data';
 import Case from './Case';
-import { isLite } from '../lib/health';
 
 const Gallery = lazy(() => import('./Gallery'));
 
@@ -10,7 +9,7 @@ export default function Work({ openSlug, setOpenSlug }) {
   const root = useRef(null);
   const preview = useRef(null);
   const [filter, setFilter] = useState('All');
-  const [mode, setMode] = useState(() => (reduceMotion() || isLite() ? 'list' : 'fly'));
+  const [mode, setMode] = useState(() => (reduceMotion() ? 'list' : 'fly'));
   const [hover, setHover] = useState(null);
   const [near, setNear] = useState(() => !isTouch()); // phones: build the 3D scene only when you get close
   const slot = useRef(null);

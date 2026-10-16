@@ -1,11 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap, ScrollTrigger, goTo, isTouch, reduceMotion } from '../lib/scroll';
 import { PROFILE } from '../data';
-import { isLite } from '../lib/health';
 
-export default function Hero({ quick, warm, ready, onPalette, onCloud }) {
-  // first-time visitors watch the galaxy for a few seconds; returning visitors get it almost straight away
-  const hold = reduceMotion() ? 0.2 : quick ? 0.35 : 3.4;
+export default function Hero({ warm, ready, onPalette, onCloud }) {
+  const hold = reduceMotion() ? 0.2 : 3.4; // how long the galaxy hangs before it collapses
   const root = useRef(null);
   const canvas = useRef(null);
   const api = useRef(null);
@@ -13,7 +11,6 @@ export default function Hero({ quick, warm, ready, onPalette, onCloud }) {
   const [fallback, setFallback] = useState(false);
 
   useEffect(() => {
-    if (isLite()) { setFallback(true); return undefined; }
     if (!warm) return undefined;
     let dead = false;
     import('../lib/particles').then((m) => m.createHeroParticles(canvas.current, { photo: PROFILE.photo, mobile: isTouch() })).then((p) => {

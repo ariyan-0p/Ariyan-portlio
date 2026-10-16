@@ -79,7 +79,7 @@ export function createGallery(canvas, items, { onActive, onHover, onOpen, mobile
   } catch {
     return null;
   }
-  const dpr = Math.min(window.devicePixelRatio || 1, mobile ? 1.5 : 1.75);
+  const dpr = Math.min(window.devicePixelRatio || 1, mobile ? 1.25 : 1.75);
   renderer.setPixelRatio(dpr);
   renderer.setClearColor(0x0c0c0b, 1);
 

@@ -156,7 +156,7 @@ function pickIndex(cum, total) {
 }
 
 function textTarget(lines, font, W, H, boxW, boxH, N, depth, tone = '') {
-  const cw = 1100;
+  const cw = N < 50000 ? 640 : 1100; // phones sample far fewer points, so a smaller mask looks the same and builds faster
   const ch = Math.max(300, Math.round((cw * H) / W));
   const c = document.createElement('canvas');
   c.width = cw; c.height = ch;
@@ -340,27 +340,6 @@ export async function createHeroParticles(canvas, { photo, mobile, onStage }) {
 
   let W = 1;
   let H = 1;
-  const build = () => {
-    const w = canvas.clientWidth || 1;
-    const h = canvas.clientHeight || 1;
-    const asp = w / h;
-    H = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-    W = H * asp;
-    if (typeof mat !== 'undefined') { mat.uniforms.uW.value = W; mat.uniforms.uH.value = H; }
-    const tall = asp < 1.05;
-    const name = tall
-      ? textTarget(['ARIYAN', 'SAMAL'], { weight: 800, family: '"Inter Tight", sans-serif', lh: 0.84, dy: 0.02 }, W, H, 0.9, 0.5, N, 0.5, 'red')
-      : textTarget(['ARIYAN SAMAL'], { weight: 800, family: '"Inter Tight", sans-serif', lh: 0.9, dy: 0.02 }, W, H, 0.9, 0.46, N, 0.5, 'red');
-    const code = textTarget(['</>'], { weight: 500, family: '"JetBrains Mono", monospace', lh: 1 }, W, H, tall ? 0.9 : 0.62, tall ? 0.3 : 0.55, N, 1.4);
-    const face = faceTarget(img, W, H, N);
-    const access = spiralTarget(N, W, H);
-    A.aA.array.set(name.pos); A.aColA.array.set(name.col);
-    A.aB.array.set(face.pos); A.aColB.array.set(face.col); A.aReal.array.set(face.real);
-    A.aC.array.set(code.pos); A.aColC.array.set(code.col);
-    A.aD.array.set(access.pos); A.aColD.array.set(access.col);
-    Object.values(A).forEach((a) => { a.needsUpdate = true; });
-  };
-
   const trail = Array.from({ length: 12 }, () => ({ x: 0, y: 0, t: -99 }));
   const trailU = Array.from({ length: 12 }, () => new THREE.Vector3(0, 0, 0));
   const mat = new THREE.ShaderMaterial({
@@ -388,13 +367,42 @@ export async function createHeroParticles(canvas, { photo, mobile, onStage }) {
     camera.updateProjectionMatrix();
   };
   resize();
-  build();
+  await buildSliced();
+
+  // The first build is the heavy one (~85k points x 4 forms). Doing it in slices keeps every frame short
+  // so the preloader above it keeps animating smoothly.
+  const nextFrame = () => new Promise((r) => requestAnimationFrame(() => r()));
+  async function buildSliced() {
+    const w = canvas.clientWidth || 1;
+    const h = canvas.clientHeight || 1;
+    const asp = w / h;
+    H = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+    W = H * asp;
+    mat.uniforms.uW.value = W; mat.uniforms.uH.value = H;
+    const tall = asp < 1.05;
+    const name = tall
+      ? textTarget(['ARIYAN', 'SAMAL'], { weight: 800, family: '"Inter Tight", sans-serif', lh: 0.84, dy: 0.02 }, W, H, 0.9, 0.5, N, 0.5, 'red')
+      : textTarget(['ARIYAN SAMAL'], { weight: 800, family: '"Inter Tight", sans-serif', lh: 0.9, dy: 0.02 }, W, H, 0.9, 0.46, N, 0.5, 'red');
+    A.aA.array.set(name.pos); A.aColA.array.set(name.col);
+    await nextFrame();
+    const code = textTarget(['</>'], { weight: 500, family: '"JetBrains Mono", monospace', lh: 1 }, W, H, tall ? 0.9 : 0.62, tall ? 0.3 : 0.55, N, 1.4);
+    A.aC.array.set(code.pos); A.aColC.array.set(code.col);
+    await nextFrame();
+    const face = faceTarget(img, W, H, N);
+    A.aB.array.set(face.pos); A.aColB.array.set(face.col); A.aReal.array.set(face.real);
+    await nextFrame();
+    const access = spiralTarget(N, W, H);
+    A.aD.array.set(access.pos); A.aColD.array.set(access.col);
+    Object.values(A).forEach((a) => { a.needsUpdate = true; });
+  }
 
   let rt = 0;
+  let firstResize = true;
   const ro = new ResizeObserver(() => {
     resize();
+    if (firstResize) { firstResize = false; return; } // the initial observation is not a resize: the build already ran
     clearTimeout(rt);
-    rt = setTimeout(build, 220);
+    rt = setTimeout(() => { buildSliced(); }, 220);
   });
   ro.observe(canvas);
 
@@ -404,7 +412,7 @@ export async function createHeroParticles(canvas, { photo, mobile, onStage }) {
     mx: 0, my: 0, mxs: 0, mys: 0, shock: -1, disperse: 0, timer: 0, hold: 0, auto: true, pauseUntil: 0,
     px: 99, py: 99,
     gov: { sum: 0, n: 0, level: 0 },
-    spin: 0, revealAt: 0,
+    spin: 0, revealAt: 0, live: false, drawn: false,
   };
   const HOLD = [2.5, 6.4, 4.2];
 
@@ -522,7 +530,7 @@ export async function createHeroParticles(canvas, { photo, mobile, onStage }) {
     points.rotation.x = S.mys * 0.1;
     u.uDisperse.value += (S.disperse - u.uDisperse.value) * (1 - Math.exp(-6 * dt));
 
-    renderer.render(scene, camera);
+    if (S.live || !S.drawn) { renderer.render(scene, camera); S.drawn = true; }
     S.raf = requestAnimationFrame(frame);
   }
   S.raf = requestAnimationFrame(frame);
@@ -530,6 +538,7 @@ export async function createHeroParticles(canvas, { photo, mobile, onStage }) {
   return {
     // hold the spinning galaxy for `delay` seconds, wind it up, then spiral it into the name
     reveal(delay = 3.4) {
+      S.live = true;
       if (S.started || S.pending) return;
       S.revealAt = performance.now() / 1000 + delay;
       S.pending = setTimeout(() => {
@@ -544,7 +553,7 @@ export async function createHeroParticles(canvas, { photo, mobile, onStage }) {
         setTimeout(() => { if (!S.dead) { mat.uniforms.uShockAmp.value = 0.28; mat.uniforms.uShockP.value.set(0, 0); S.shock = 0; } }, 3350);
       }, delay * 1000);
     },
-    goTo(i) { clearTimeout(S.pending); S.pending = 0; S.revealAt = 0; S.started = true; goTo(i, true); },
+    goTo(i) { S.live = true; clearTimeout(S.pending); S.pending = 0; S.revealAt = 0; S.started = true; goTo(i, true); },
     shock(x = 0, y = 0, amp = 1) { mat.uniforms.uShockAmp.value = amp; mat.uniforms.uShockP.value.set(x, y); S.shock = 0; },
     setDisperse(v) { S.disperse = v; },
     destroy() {
