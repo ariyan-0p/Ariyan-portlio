@@ -2,6 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } fro
 import { gsap, isTouch, reduceMotion, ScrollTrigger } from '../lib/scroll';
 import { PROJECTS, FILTERS } from '../data';
 import Case from './Case';
+import { isLite } from '../lib/health';
 
 const Gallery = lazy(() => import('./Gallery'));
 
@@ -9,8 +10,10 @@ export default function Work({ openSlug, setOpenSlug }) {
   const root = useRef(null);
   const preview = useRef(null);
   const [filter, setFilter] = useState('All');
-  const [mode, setMode] = useState(() => (reduceMotion() ? 'list' : 'fly'));
+  const [mode, setMode] = useState(() => (reduceMotion() || isLite() ? 'list' : 'fly'));
   const [hover, setHover] = useState(null);
+  const [near, setNear] = useState(() => !isTouch()); // phones: build the 3D scene only when you get close
+  const slot = useRef(null);
   const touch = useMemo(() => isTouch(), []);
 
   // header + row reveal
@@ -48,6 +51,13 @@ export default function Work({ openSlug, setOpenSlug }) {
     window.addEventListener('pointermove', move, { passive: true });
     return () => window.removeEventListener('pointermove', move);
   }, [touch, mode]);
+
+  useEffect(() => {
+    if (near || mode !== 'fly' || !slot.current) return undefined;
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setNear(true); io.disconnect(); } }, { rootMargin: '450px 0px' });
+    io.observe(slot.current);
+    return () => io.disconnect();
+  }, [near, mode]);
 
   // the section's height changes between views
   useEffect(() => {
@@ -97,11 +107,13 @@ export default function Work({ openSlug, setOpenSlug }) {
         </div>
       </div>
 
-      {mode === 'fly' && (
+      {mode === 'fly' && (near ? (
         <Suspense fallback={<div className="gal__loading">Loading scene…</div>}>
           <Gallery onOpen={setOpenSlug} onFallback={() => setMode('list')} />
         </Suspense>
-      )}
+      ) : (
+        <div ref={slot} className="gal" style={{ height: `${PROJECTS.length * 85 + 100}vh` }} aria-hidden="true" />
+      ))}
 
       {mode === 'list' && <ul className={`wk__list ${hover ? 'has-hover' : ''}`}>
         {PROJECTS.map((p) => {

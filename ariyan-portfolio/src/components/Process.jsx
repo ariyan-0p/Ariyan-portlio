@@ -40,7 +40,7 @@ function Mock({ s }) {
         <div className="pm__note pm__note--c">mobile first</div>
         <div className="pm__dim pm__dim--w">1440</div>
         <div className="pm__dim pm__dim--g">12 col</div>
-        <img className="pm__shot" src={SHOT.shot} alt="" loading="lazy" />
+        <img className="pm__shot" src={SHOT.thumb} alt="" loading="lazy" />
         <div className="pm__code">
           <p><em>export default function</em> Quote() {'{'}</p>
           <p>&nbsp;&nbsp;<em>const</em> [items] = <b>useCart</b>()</p>

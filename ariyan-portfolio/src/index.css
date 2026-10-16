@@ -673,3 +673,7 @@ html.invert .case__meta, html.invert .case__nav { --line: rgba(236, 232, 224, 0.
   .c-role { font-size: 1.15rem; }
   .c-org { font-size: 1rem; }
 }
+
+/* lite mode (switched on automatically after repeated page crashes): no heavy scenes */
+.lite .hero__canvas { display: none; }
+.lite .grain { display: none; }

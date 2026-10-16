@@ -305,14 +305,14 @@ export async function createHeroParticles(canvas, { photo, mobile, onStage }) {
   } catch {
     return null;
   }
-  const dpr = Math.min(window.devicePixelRatio || 1, mobile ? 1.5 : 2);
+  const dpr = Math.min(window.devicePixelRatio || 1, mobile ? 1.25 : 2);
   renderer.setPixelRatio(dpr);
   renderer.setClearColor(0x0c0c0b, 1);
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 120);
   camera.position.z = 22;
-  const N = mobile ? 38000 : 85000;
+  const N = mobile ? 30000 : 85000;
 
   const img = new Image();
   const imgReady = new Promise((res) => { img.onload = res; img.onerror = res; });

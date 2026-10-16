@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap, ScrollTrigger, goTo, isTouch, reduceMotion } from '../lib/scroll';
 import { PROFILE } from '../data';
+import { isLite } from '../lib/health';
 
-export default function Hero({ warm, ready, onPalette, onCloud }) {
+export default function Hero({ quick, warm, ready, onPalette, onCloud }) {
+  // first-time visitors watch the galaxy for a few seconds; returning visitors get it almost straight away
+  const hold = reduceMotion() ? 0.2 : quick ? 0.35 : 3.4;
   const root = useRef(null);
   const canvas = useRef(null);
   const api = useRef(null);
@@ -10,6 +13,7 @@ export default function Hero({ warm, ready, onPalette, onCloud }) {
   const [fallback, setFallback] = useState(false);
 
   useEffect(() => {
+    if (isLite()) { setFallback(true); return undefined; }
     if (!warm) return undefined;
     let dead = false;
     import('../lib/particles').then((m) => m.createHeroParticles(canvas.current, { photo: PROFILE.photo, mobile: isTouch() })).then((p) => {
@@ -17,22 +21,22 @@ export default function Hero({ warm, ready, onPalette, onCloud }) {
       if (!p) { setFallback(true); return; }
       api.current = p;
       if (onCloud) onCloud();
-      if (wantReveal.current) p.reveal(reduceMotion() ? 0.2 : 3.4);
+      if (wantReveal.current) p.reveal(hold);
     });
     return () => { dead = true; if (api.current) { api.current.destroy(); api.current = null; } };
-  }, [warm, onCloud]);
+  }, [warm, onCloud, hold]);
 
   useEffect(() => {
     if (!ready) return undefined;
     wantReveal.current = true;
-    if (api.current) api.current.reveal(reduceMotion() ? 0.2 : 3.4);
+    if (api.current) api.current.reveal(hold);
     const ctx = gsap.context(() => {
       const fast = reduceMotion();
       gsap.fromTo('.hero__canvas', { scale: 1.35, opacity: 0.2 }, { scale: 1, opacity: 1, duration: fast ? 0.01 : 2.2, ease: 'expo.out' });
       gsap.from('.hero__fade', { opacity: 0, y: 26, duration: fast ? 0.01 : 1, stagger: 0.1, ease: 'expo.out', delay: 1.6 });
     }, root);
     return () => ctx.revert();
-  }, [ready]);
+  }, [ready, hold]);
 
   // the preloader's screen shatters: send a full-strength shockwave through the cloud
   useEffect(() => {

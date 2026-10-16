@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { gsap, reduceMotion } from '../lib/scroll';
 import { PROFILE, PROJECTS } from '../data';
+import { markIntroSeen } from '../lib/intro';
 
 // A fake "hack-in" terminal that is secretly doing real work: it preloads the fonts, the portrait
 // and every project screenshot, and reads the visitor's viewport / cores / timezone locally.
@@ -14,7 +15,7 @@ const BANNER = boxed(['A R I Y A N   S A M A L', 'full-stack engineer · interfa
 
 const ASSETS = [
   ['ariyan.jpg', PROFILE.photo],
-  ...PROJECTS.map((p) => [`${p.slug}.jpg`, p.shot]),
+  ...PROJECTS.map((p) => [`${p.slug}.jpg`, p.thumb]),
 ];
 
 const HEX = '0123456789abcdef';
@@ -39,7 +40,7 @@ export default function Loader({ onWarm, cloudReady, onReveal, onDone }) {
   const grant = useRef(null);
 
   useEffect(() => {
-    const fast = reduceMotion() || sessionStorage.getItem('as_seen') === '1';
+    const fast = reduceMotion();
     let dead = false;
     const timers = new Set();
     const sleep = (ms) => new Promise((res) => {
@@ -136,8 +137,8 @@ export default function Loader({ onWarm, cloudReady, onReveal, onDone }) {
         }
         if (/[?&]slow=1/.test(window.location.search)) gsap.globalTimeline.timeScale(0.12); // debugging aid: watch the break in slow motion
         const BG = '#070908';
-        const cols = vw < 700 ? 4 : 7;
-        const rows = vw < 700 ? 6 : 4;
+        const cols = vw < 700 ? 3 : 7;
+        const rows = vw < 700 ? 5 : 4;
         // jittered grid of points (the border stays straight so the shards tile the whole screen)
         const pt = [];
         for (let j = 0; j <= rows; j++) {
@@ -303,7 +304,7 @@ export default function Loader({ onWarm, cloudReady, onReveal, onDone }) {
       add('<span class="t-ok">permission granted</span>');
       await sleep(260);
       if (dead) return;
-      sessionStorage.setItem('as_seen', '1');
+      markIntroSeen();
       await access();
     }
 

@@ -59,7 +59,7 @@ export default function Marquee() {
         <Ticker dir={-1}>
           {clientSet.map((p, i) => (
             <a className="mq__client" key={`${p.slug}${i}`} href={p.link} target="_blank" rel="noopener noreferrer" tabIndex={i >= clients.length ? -1 : 0}>
-              <img src={p.shot} alt="" loading="lazy" />
+              <img src={p.thumb} alt="" loading="lazy" decoding="async" />
               <span>{p.title}</span>
             </a>
           ))}

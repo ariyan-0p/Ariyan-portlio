@@ -12,7 +12,8 @@ export default function Gallery({ onOpen, onFallback }) {
   const touch = isTouch();
 
   useEffect(() => {
-    const g = createGallery(canvas.current, PROJECTS, {
+    const items = touch ? PROJECTS.map((p) => ({ ...p, shot: p.thumb })) : PROJECTS; // phones: 1MB textures instead of 4MB
+    const g = createGallery(canvas.current, items, {
       mobile: touch,
       onActive: setActive,
       onOpen: (i) => onOpen(PROJECTS[i].slug),
