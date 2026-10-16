@@ -3,11 +3,11 @@ import { gsap, isIOS, pinCards } from '../lib/scroll';
 import { PROJECTS } from '../data';
 
 const STEPS = [
-  { n: '01', name: 'Brief', url: 'sketch — paper', sub: 'Listen first', desc: 'Goals, users and constraints — a one-page plan before a single pixel moves.', tags: ['Discovery', 'Scope', 'Success metrics'] },
-  { n: '02', name: 'Wireframe', url: 'wireframe — grid', sub: 'Structure before style', desc: 'Flows, layout and content hierarchy, argued over while it is still cheap to change.', tags: ['Flows', 'Layout', 'Content'] },
-  { n: '03', name: 'Design', url: 'design — system', sub: 'A point of view', desc: 'A visual system with taste: type, colour and motion, drawn so it can actually be built.', tags: ['Type', 'Colour', 'Motion'] },
-  { n: '04', name: 'Build', url: 'localhost:5173', sub: 'Production, not prototypes', desc: 'Typed APIs, tests and a performance budget from the first commit.', tags: ['React', 'Node', 'Tests'] },
-  { n: '05', name: 'Ship', url: 'griplindia.com', sub: 'And keep going', desc: 'CI/CD to the cloud, monitoring and a clean handover — then iterate on real usage.', tags: ['CI/CD', 'AWS', 'Monitoring'] },
+  { n: '01', name: 'Brief', url: 'sketch — paper', sub: 'Listen first', desc: 'Goals, users and constraints — a one-page plan before a single pixel moves.' },
+  { n: '02', name: 'Wireframe', url: 'wireframe — grid', sub: 'Structure before style', desc: 'Flows, layout and content hierarchy, argued over while it is still cheap to change.' },
+  { n: '03', name: 'Design', url: 'design — system', sub: 'A point of view', desc: 'A visual system with taste: type, colour and motion, drawn so it can actually be built.' },
+  { n: '04', name: 'Build', url: 'localhost:5173', sub: 'Production, not prototypes', desc: 'Typed APIs, tests and a performance budget from the first commit.' },
+  { n: '05', name: 'Ship', url: 'griplindia.com', sub: 'And keep going', desc: 'CI/CD to the cloud, monitoring and a clean handover — then iterate on real usage.' },
 ];
 
 const SHOT = PROJECTS.find((p) => p.slug === 'gripl');
@@ -104,7 +104,6 @@ export default function Process() {
                 <div className="prc__sub">{p.sub}</div>
                 <h3>{p.name}</h3>
                 <p>{p.desc}</p>
-                <ul>{p.tags.map((t) => <li key={t}>{t}</li>)}</ul>
               </div>
               <div className="prc__visual"><Mock s={i} /></div>
             </div>

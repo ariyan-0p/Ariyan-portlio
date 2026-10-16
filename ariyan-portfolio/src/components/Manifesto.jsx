@@ -132,7 +132,6 @@ export default function Manifesto() {
                   <div className="mf__more">
                     <div>
                       <p>{c.desc}</p>
-                      <ul>{c.tags.map((t) => <li key={t}>{t}</li>)}</ul>
                     </div>
                   </div>
                 </li>

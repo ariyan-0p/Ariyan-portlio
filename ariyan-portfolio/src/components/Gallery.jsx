@@ -68,7 +68,6 @@ export default function Gallery({ onOpen, onFallback }) {
             <div className="gal__cat"><i />{cur.category} — {cur.year}</div>
             <h3 className="gal__title"><span>{cur.title}</span></h3>
             <div className="gal__row">
-              <div className="gal__tags">{cur.tech.slice(0, 4).map((t) => <span key={t}>{t}</span>)}</div>
               <button className="btn btn--solid" onClick={() => onOpen(cur.slug)}><span>Open case</span><i>↗</i></button>
             </div>
           </div>
