@@ -9,11 +9,13 @@ import { PROJECTS } from '../data';
 // simple-icons has no AWS mark any more — a plain cloud glyph stands in for it.
 const CLOUD = 'M6.5 19a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 17.4 8.6 4.9 4.9 0 0 1 17.5 19Z';
 
+// [name, svg path, brand colour] — each logo is drawn in its own colour (names are only for screen readers)
+const brand = (icon, name) => [name || icon.title, icon.path, `#${icon.hex}`];
 const TECH = [
-  ['React', siReact.path], ['Next.js', siNextdotjs.path], ['Node.js', siNodedotjs.path], ['Express', siExpress.path],
-  ['Flutter', siFlutter.path], ['Go', siGo.path], ['Python', siPython.path], ['TensorFlow', siTensorflow.path],
-  ['MongoDB', siMongodb.path], ['Firebase', siFirebase.path], ['AWS', CLOUD], ['Docker', siDocker.path],
-  ['GSAP', siGreensock.path], ['WebGL', siWebgl.path], ['Three.js', siThreedotjs.path], ['Tailwind', siTailwindcss.path], ['Git', siGit.path],
+  brand(siReact), brand(siNextdotjs), brand(siNodedotjs), brand(siExpress),
+  brand(siFlutter), brand(siGo), brand(siPython), brand(siTensorflow),
+  brand(siMongodb), brand(siFirebase), ['AWS', CLOUD, '#FF9900'], brand(siDocker),
+  brand(siGreensock, 'GSAP'), brand(siWebgl), brand(siThreedotjs), brand(siTailwindcss), brand(siGit),
 ];
 
 // A ticker whose speed reacts to scroll velocity.
@@ -69,10 +71,9 @@ export default function Marquee() {
           <h2>Built with</h2>
         </header>
         <Ticker dir={1}>
-          {techSet.map(([name, path], i) => (
-            <span className="mq__tech" key={`${name}${i}`}>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d={path} /></svg>
-              <span>{name}</span>
+          {techSet.map(([name, path, color], i) => (
+            <span className="mq__tech" key={`${name}${i}`} role="img" aria-label={name} aria-hidden={i >= TECH.length} title={name}>
+              <svg viewBox="0 0 24 24" aria-hidden="true" style={{ fill: color }}><path d={path} /></svg>
             </span>
           ))}
         </Ticker>
