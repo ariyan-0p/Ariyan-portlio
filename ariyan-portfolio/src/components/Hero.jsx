@@ -2,24 +2,17 @@ import { useEffect, useRef, useState } from 'react';
 import { gsap, ScrollTrigger, goTo, isTouch, reduceMotion } from '../lib/scroll';
 import { PROFILE } from '../data';
 
-const STAGES = [
-  { k: '01', label: 'Name' },
-  { k: '02', label: 'Face' },
-  { k: '03', label: 'Code' },
-];
-
 export default function Hero({ warm, ready, onPalette, onCloud }) {
   const root = useRef(null);
   const canvas = useRef(null);
   const api = useRef(null);
   const wantReveal = useRef(false);
-  const [stage, setStage] = useState(0);
   const [fallback, setFallback] = useState(false);
 
   useEffect(() => {
     if (!warm) return undefined;
     let dead = false;
-    import('../lib/particles').then((m) => m.createHeroParticles(canvas.current, { photo: PROFILE.photo, mobile: isTouch(), onStage: setStage })).then((p) => {
+    import('../lib/particles').then((m) => m.createHeroParticles(canvas.current, { photo: PROFILE.photo, mobile: isTouch() })).then((p) => {
       if (dead) { p && p.destroy(); return; }
       if (!p) { setFallback(true); return; }
       api.current = p;
@@ -51,25 +44,16 @@ export default function Hero({ warm, ready, onPalette, onCloud }) {
 
   return (
     <section id="top" ref={root} className={`hero ${fallback ? 'is-fallback' : ''}`}>
-      <canvas ref={canvas} className="hero__canvas" aria-hidden="true" data-cursor="DISTURB" />
+      <canvas ref={canvas} className="hero__canvas" aria-hidden="true" />
 
       <h1 className="hero__name">Ariyan Samal<span className="sr-only"> — full-stack engineer in Hyderabad, India</span></h1>
 
       <div className="hero__foot">
         <div className="hero__copy">
           <div className="hero__cta hero__fade">
-            <button className="btn btn--solid" onClick={() => goTo('work')} data-cursor="GO"><span>See the work</span><i>↓</i></button>
+            <button className="btn btn--solid" onClick={() => goTo('work')}><span>See the work</span><i>↓</i></button>
             <button className="btn" onClick={onPalette}><span>Command menu</span><kbd>⌘K</kbd></button>
           </div>
-        </div>
-
-        <div className="hero__stages hero__fade" role="tablist" aria-label="Hero form">
-          {STAGES.map((s, i) => (
-            <button key={s.k} role="tab" aria-selected={stage === i} className={stage === i ? 'is-on' : ''} onClick={() => api.current && api.current.goTo(i)} data-cursor="MORPH">
-              <span>{s.k}</span>{s.label}<i />
-            </button>
-          ))}
-          <em>click anywhere — shockwave</em>
         </div>
       </div>
     </section>

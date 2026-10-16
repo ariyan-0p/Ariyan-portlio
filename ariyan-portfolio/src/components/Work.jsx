@@ -76,8 +76,8 @@ export default function Work({ openSlug, setOpenSlug }) {
         </h2>
         <div className="wk__bar2">
         <div className="wk__mode" role="tablist" aria-label="View">
-          <button role="tab" aria-selected={mode === 'fly'} className={mode === 'fly' ? 'is-on' : ''} onClick={() => setMode('fly')} data-cursor="VIEW">◉ Fly-through</button>
-          <button role="tab" aria-selected={mode === 'list'} className={mode === 'list' ? 'is-on' : ''} onClick={() => setMode('list')} data-cursor="VIEW">≡ Index</button>
+          <button role="tab" aria-selected={mode === 'fly'} className={mode === 'fly' ? 'is-on' : ''} onClick={() => setMode('fly')}>◉ Fly-through</button>
+          <button role="tab" aria-selected={mode === 'list'} className={mode === 'list' ? 'is-on' : ''} onClick={() => setMode('list')}>≡ Index</button>
         </div>
         {mode === 'list' && <div className="wk__filters" role="tablist" aria-label="Filter projects">
           {FILTERS.map((f) => (
@@ -87,7 +87,7 @@ export default function Work({ openSlug, setOpenSlug }) {
               aria-selected={filter === f}
               className={filter === f ? 'is-on' : ''}
               onClick={() => setFilter(f)}
-              data-cursor="FILTER"
+             
             >
               {f}
               <sup>{f === 'All' ? PROJECTS.length : PROJECTS.filter((p) => p.type === f).length}</sup>
@@ -115,7 +115,7 @@ export default function Work({ openSlug, setOpenSlug }) {
                 onFocus={() => !touch && enter(p.slug)}
                 onBlur={leave}
                 onClick={() => { leave(); setOpenSlug(p.slug); }}
-                data-cursor="VIEW"
+               
                 style={{ '--accent': p.accent }}
                 tabIndex={off ? -1 : 0}
               >

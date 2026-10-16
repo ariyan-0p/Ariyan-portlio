@@ -15,9 +15,6 @@ export default function Gallery({ onOpen, onFallback }) {
     const g = createGallery(canvas.current, PROJECTS, {
       mobile: touch,
       onActive: setActive,
-      onHover: (i) => {
-        if (canvas.current) canvas.current.setAttribute('data-cursor', i >= 0 ? 'OPEN' : '');
-      },
       onOpen: (i) => onOpen(PROJECTS[i].slug),
     });
     if (!g) { onFallback(); return undefined; }
@@ -60,7 +57,7 @@ export default function Gallery({ onOpen, onFallback }) {
           <ol className="gal__ticks" aria-label="Jump to project">
             {PROJECTS.map((p, i) => (
               <li key={p.slug}>
-                <button className={i === active ? 'is-on' : ''} onClick={() => jump(i)} aria-label={`Go to ${p.title}`} data-cursor="GO">
+                <button className={i === active ? 'is-on' : ''} onClick={() => jump(i)} aria-label={`Go to ${p.title}`}>
                   <span>{p.id}</span><i />
                 </button>
               </li>
@@ -72,7 +69,7 @@ export default function Gallery({ onOpen, onFallback }) {
             <h3 className="gal__title"><span>{cur.title}</span></h3>
             <div className="gal__row">
               <div className="gal__tags">{cur.tech.slice(0, 4).map((t) => <span key={t}>{t}</span>)}</div>
-              <button className="btn btn--solid" onClick={() => onOpen(cur.slug)} data-cursor="OPEN"><span>Open case</span><i>↗</i></button>
+              <button className="btn btn--solid" onClick={() => onOpen(cur.slug)}><span>Open case</span><i>↗</i></button>
             </div>
           </div>
         </div>

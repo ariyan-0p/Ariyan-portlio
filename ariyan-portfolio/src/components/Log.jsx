@@ -94,7 +94,7 @@ export default function Log() {
             <ol className="lg__graph" aria-label="Career commit graph">
               {LOG.map((c, i) => (
                 <li key={c.hash} className={`lg__row ${c.kind === 'edu' ? 'is-edu' : 'is-work'} ${i === active ? 'is-on' : ''} ${i < active ? 'is-past' : ''} ${i === work - 1 ? 'is-fork' : ''} ${i === 0 ? 'is-first' : ''}`}>
-                  <button onClick={() => jump(i)} data-cursor="CHECKOUT">
+                  <button onClick={() => jump(i)}>
                     <span className="lg__lane"><i className="lg__node" /></span>
                     <span className="lg__lbl">
                       <code>{c.hash}</code>
@@ -118,7 +118,7 @@ export default function Log() {
               <div className="lg__oneline">
                 <div className="lg__ohead">$ git log --oneline</div>
                 {LOG.map((c, i) => (
-                  <button key={c.hash} className={i === active ? 'is-on' : ''} onClick={() => jump(i)} data-cursor="CHECKOUT">
+                  <button key={c.hash} className={i === active ? 'is-on' : ''} onClick={() => jump(i)}>
                     <code>{c.hash}</code>
                     <span>{c.head && <u>HEAD</u>}{c.role}</span>
                   </button>

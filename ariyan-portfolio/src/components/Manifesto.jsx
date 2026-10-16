@@ -125,7 +125,7 @@ export default function Manifesto() {
             <ol className="mf__layers">
               {CAPABILITIES.map((c, i) => (
                 <li key={c.n} className={i === active ? 'is-on' : ''}>
-                  <button onClick={() => jump(i)} data-cursor="LAYER">
+                  <button onClick={() => jump(i)}>
                     <span className="mf__n">{c.n}</span>
                     <span className="mf__name">{c.title}</span>
                   </button>

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap, goTo } from '../lib/scroll';
 import { PROFILE } from '../data';
-import { useClock } from '../lib/useClock';
 
 // Web3Forms: notifies Ariyan of every lead (public access key by design).
 const WEB3FORMS_ACCESS_KEY = '27fbabea-da5e-4cff-9520-6cf096ef7e24';
@@ -26,7 +25,6 @@ function Chips({ options, value, onPick, label }) {
 
 export default function Contact() {
   const root = useRef(null);
-  const time = useClock();
   const [step, setStep] = useState(1);
   const [status, setStatus] = useState('idle'); // idle | loading | success | error
   const [err, setErr] = useState('');
@@ -101,7 +99,7 @@ export default function Contact() {
         <div className="ct__side">
           <p className="ct__lede ct__rev">Tell me what you’re making. I reply within a day — usually faster.</p>
           <ul className="ct__links ct__rev">
-            <li><span>Mail</span><a href={`mailto:${PROFILE.email}`} data-cursor="MAIL">{PROFILE.email}</a></li>
+            <li><span>Mail</span><a href={`mailto:${PROFILE.email}`}>{PROFILE.email}</a></li>
             <li><span>Phone</span><a href={PROFILE.tel}>{PROFILE.phone}</a></li>
             <li><span>WhatsApp</span><a href={PROFILE.whatsapp} target="_blank" rel="noopener noreferrer">Message me ↗</a></li>
             <li><span>LinkedIn</span><a href={PROFILE.linkedin} target="_blank" rel="noopener noreferrer">ariyan-samal ↗</a></li>
@@ -161,9 +159,9 @@ export default function Contact() {
 
       <footer className="foot">
         <span>© 2026 Ariyan Samal</span>
-        <span>{PROFILE.location} · IST {time}</span>
+        <span>{PROFILE.location}</span>
         <span>{PROFILE.coords}</span>
-        <button onClick={() => goTo('top')} data-cursor="TOP">Back to top ↑</button>
+        <button onClick={() => goTo('top')}>Back to top ↑</button>
       </footer>
     </section>
   );

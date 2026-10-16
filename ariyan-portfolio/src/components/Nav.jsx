@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
 import { goTo } from '../lib/scroll';
-import { useClock } from '../lib/useClock';
 import { SECTIONS } from '../data';
 
 export default function Nav({ onPalette }) {
-  const time = useClock();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -16,7 +14,7 @@ export default function Nav({ onPalette }) {
   return (
     <>
       <header className="nav">
-        <button className="nav__brand" onClick={() => go('top')} data-cursor="TOP">
+        <button className="nav__brand" onClick={() => go('top')}>
           <span className="nav__logo">AS</span>
           <span className="nav__name">Ariyan Samal<sup>©26</sup></span>
         </button>
@@ -30,8 +28,7 @@ export default function Nav({ onPalette }) {
         </nav>
 
         <div className="nav__right">
-          <span className="nav__clock"><i className="dot" />IST {time}</span>
-          <button className="nav__kbd" onClick={onPalette} aria-label="Open command palette" data-cursor="CMD">
+          <button className="nav__kbd" onClick={onPalette} aria-label="Open command palette">
             <kbd>⌘</kbd><kbd>K</kbd>
           </button>
           <button className="nav__menu" onClick={() => setOpen((o) => !o)} aria-label="Menu" aria-expanded={open}>

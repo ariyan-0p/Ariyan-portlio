@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { startScroll, stopScroll, lockScroll, unlockScroll, gsap, ScrollTrigger, reduceMotion } from './lib/scroll';
 import Loader from './components/Loader';
-import Cursor from './components/Cursor';
 import Nav from './components/Nav';
 import Palette from './components/Palette';
 import Ruler from './components/Ruler';
@@ -56,7 +55,6 @@ export default function App() {
   return (
     <>
       <Loader onWarm={onWarm} cloudReady={cloudReady} onReveal={onReveal} onDone={onDone} />
-      <Cursor />
       <div className="grain" aria-hidden="true" />
       <Nav onPalette={() => setPalette(true)} />
       <Ruler />

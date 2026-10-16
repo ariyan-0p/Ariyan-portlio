@@ -47,7 +47,6 @@ img, canvas, svg { display: block; max-width: 100%; }
 :focus-visible { outline: 2px solid var(--sig); outline-offset: 3px; }
 code, kbd, pre { font-family: var(--mono); }
 kbd { font-size: 0.84rem; padding: 0.15rem 0.4rem; border: 1px solid currentColor; border-radius: 4px; opacity: 0.8; }
-html.has-cursor, html.has-cursor * { cursor: none !important; }
 
 .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--sig); margin-right: 0.55rem; vertical-align: middle; animation: pulse 1.8s infinite; }
 @keyframes pulse { 50% { opacity: 0.25; transform: scale(0.7); } }
@@ -63,20 +62,6 @@ html.has-cursor, html.has-cursor * { cursor: none !important; }
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
 }
 @keyframes grain { 0% { transform: translate(0, 0); } 20% { transform: translate(-3%, 2%); } 40% { transform: translate(2%, -3%); } 60% { transform: translate(-2%, -1%); } 80% { transform: translate(3%, 3%); } 100% { transform: translate(0, 0); } }
-
-/* ───────────────────────── Cursor ───────────────────────── */
-.cursor-dot, .cursor-ring { position: fixed; top: 0; left: 0; z-index: 300; pointer-events: none; mix-blend-mode: difference; display: none; }
-html.has-cursor .cursor-dot, html.has-cursor .cursor-ring { display: block; }
-.cursor-dot { width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: #fff; }
-.cursor-ring {
-  width: 38px; height: 38px; margin: -19px 0 0 -19px; border-radius: 50%; border: 1px solid #fff;
-  display: grid; place-items: center; transition: width 0.4s var(--ease), height 0.4s var(--ease), margin 0.4s var(--ease), background 0.3s, transform 0.2s;
-}
-.cursor-ring span { font: 500 0.78rem/1 var(--mono); letter-spacing: 0.08em; color: #000; opacity: 0; transition: opacity 0.2s; }
-.cursor-ring.is-link { width: 60px; height: 60px; margin: -30px 0 0 -30px; }
-.cursor-ring.is-label { width: 108px; height: 108px; margin: -54px 0 0 -54px; background: #fff; }
-.cursor-ring.is-label span { opacity: 1; }
-.cursor-ring.is-down { transform: scale(0.85); }
 
 /* ───────────────────────── Loader (terminal) ───────────────────────── */
 .boot { position: fixed; inset: 0; z-index: 400; background: #070908; color: var(--bone); font-family: var(--mono); overflow: hidden; }
@@ -138,7 +123,6 @@ html.has-cursor .cursor-dot, html.has-cursor .cursor-ring { display: block; }
 .nav__link::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: #fff; transform: scaleX(0); transform-origin: right; transition: transform 0.5s var(--ease); }
 .nav__link:hover::after { transform: scaleX(1); transform-origin: left; }
 .nav__right { display: flex; align-items: center; gap: 1.1rem; justify-self: end; }
-.nav__clock { white-space: nowrap; font-variant-numeric: tabular-nums; }
 .nav__kbd { display: inline-flex; gap: 0.25rem; }
 .nav__menu { display: none; width: 2.4rem; height: 2.4rem; position: relative; }
 .nav__menu span { position: absolute; left: 0.5rem; right: 0.5rem; height: 1.5px; background: #fff; transition: transform 0.5s var(--ease); }
@@ -204,13 +188,6 @@ html.menu-open .nav__menu span:last-child { transform: translateY(-0.25rem) rota
 .hero__cta { display: flex; gap: 0.7rem; flex-wrap: wrap; }
 .hero .btn { --fg: var(--bone); --bg: var(--ink); }
 .hero__cta .btn kbd { border-color: currentColor; }
-.hero__stages { display: grid; justify-items: end; gap: 0.2rem; font: 400 0.9rem var(--mono); text-transform: uppercase; letter-spacing: 0.08em; }
-.hero__stages button { position: relative; display: flex; align-items: center; gap: 0.9rem; padding: 0.45rem 0; opacity: 0.5; transition: opacity 0.3s; }
-.hero__stages button span { color: var(--sig); }
-.hero__stages button i { display: block; width: 18px; height: 1px; background: currentColor; transition: width 0.6s var(--ease), background 0.3s; }
-.hero__stages button:hover, .hero__stages button.is-on { opacity: 1; }
-.hero__stages button.is-on i { width: 56px; background: var(--sig); }
-.hero__stages em { margin: 0.8rem 0 0.9rem; font: italic 400 1rem var(--serif); text-transform: none; letter-spacing: 0; opacity: 0.55; }
 
 /* ───────────────────────── Marquee ───────────────────────── */
 .mq { background: var(--sig); color: var(--ink); overflow: hidden; position: relative; z-index: 4; padding: clamp(2.4rem, 5vw, 4.5rem) 0 clamp(2.6rem, 5vw, 4.5rem); }
@@ -583,7 +560,6 @@ html.invert .case__meta, html.invert .case__nav { --line: rgba(236, 232, 224, 0.
 
 /* ───────────────────────── Responsive ───────────────────────── */
 @media (max-width: 1100px) {
-  .nav__clock { display: none; }
   .wk__row { grid-template-columns: 2.6rem minmax(0, 1fr) 11rem 3rem 2rem; }
   .wk__tech { display: none; }
 }
@@ -592,10 +568,7 @@ html.invert .case__meta, html.invert .case__nav { --line: rgba(236, 232, 224, 0.
   .nav__links, .nav__kbd { display: none; }
   .nav__menu { display: block; }
   .ruler { display: none; }
-  .hero__stages button { flex-direction: column; align-items: flex-start; gap: 0.3rem; }
   .hero__foot { flex-direction: column; align-items: stretch; gap: 1.4rem; }
-  .hero__stages { justify-items: start; grid-auto-flow: column; gap: 1.4rem; }
-  .hero__stages em { display: none; }
   .hero__cta .btn:nth-child(2) { display: none; }
   .mf__stats { grid-template-columns: 1fr 1fr; row-gap: 2rem; }
   .mf__stat:nth-child(3) { border-left: 0; padding-left: 0; }
@@ -655,11 +628,10 @@ html.invert .case__meta, html.invert .case__nav { --line: rgba(236, 232, 224, 0.
   .nav__menu span:last-child { top: 1.75rem; }
   html.menu-open .nav__menu span:first-child { transform: translateY(0.25rem) rotate(45deg); }
   html.menu-open .nav__menu span:last-child { transform: translateY(-0.25rem) rotate(-45deg); }
-  .btn, .chips button, .wk__filters button, .wk__mode button, .case__close, .hero__stages button, .gal__ticks button { min-height: 44px; }
+  .btn, .chips button, .wk__filters button, .wk__mode button, .case__close, .gal__ticks button { min-height: 44px; }
   .lg__oneline button { min-height: 36px; align-items: center; }
   .ct__links li { padding: 1rem 0; }
   .ct__links a { padding: 0.8rem 0; margin: -0.8rem 0; }
-  .hero__stages button { min-width: 44px; }
   .wk__mode button { display: inline-flex; align-items: center; }
   .sheet__foot button { min-height: 44px; }
 }

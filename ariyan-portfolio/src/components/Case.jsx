@@ -59,7 +59,7 @@ export default function Case({ slug, onClose, onNav }) {
         <>
           <div className="case__top">
             <span className="case__crumb">Selected work / {p.id} — {String(PROJECTS.length).padStart(2, '0')}</span>
-            <button className="case__close" onClick={onClose} data-cursor="CLOSE">Close <kbd>esc</kbd></button>
+            <button className="case__close" onClick={onClose}>Close <kbd>esc</kbd></button>
           </div>
 
           <div className="case__body">
@@ -79,7 +79,7 @@ export default function Case({ slug, onClose, onNav }) {
                 {p.tech.map((t) => <span key={t}>{t}</span>)}
               </div>
 
-              <a className="btn btn--solid case__visit case__fade" href={p.link} target="_blank" rel="noopener noreferrer" data-cursor="OPEN">
+              <a className="btn btn--solid case__visit case__fade" href={p.link} target="_blank" rel="noopener noreferrer">
                 <span>Visit {p.url}</span><i>↗</i>
               </a>
             </div>
@@ -93,8 +93,8 @@ export default function Case({ slug, onClose, onNav }) {
           </div>
 
           <div className="case__nav">
-            <button onClick={() => onNav(prev.slug)} data-cursor="PREV"><span>← Previous</span><b>{prev.title}</b></button>
-            <button onClick={() => onNav(next.slug)} data-cursor="NEXT" className="is-next"><span>Next →</span><b>{next.title}</b></button>
+            <button onClick={() => onNav(prev.slug)}><span>← Previous</span><b>{prev.title}</b></button>
+            <button onClick={() => onNav(next.slug)} className="is-next"><span>Next →</span><b>{next.title}</b></button>
           </div>
         </>
       )}
