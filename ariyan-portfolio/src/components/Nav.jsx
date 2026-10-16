@@ -22,9 +22,9 @@ export default function Nav({ onPalette }) {
         </button>
 
         <nav className="nav__links" aria-label="Primary">
-          {SECTIONS.slice(1).map((s, i) => (
+          {SECTIONS.slice(1).map((s) => (
             <button key={s.id} onClick={() => go(s.id)} className="nav__link">
-              <em>0{i + 1}</em>{s.label}
+              {s.label}
             </button>
           ))}
         </nav>
@@ -42,9 +42,9 @@ export default function Nav({ onPalette }) {
 
       <div className={`sheet ${open ? 'is-open' : ''}`} aria-hidden={!open}>
         <ul>
-          {SECTIONS.slice(1).map((s, i) => (
+          {SECTIONS.slice(1).map((s) => (
             <li key={s.id}>
-              <button onClick={() => go(s.id)}><em>0{i + 1}</em>{s.label}</button>
+              <button onClick={() => go(s.id)}>{s.label}</button>
             </li>
           ))}
         </ul>

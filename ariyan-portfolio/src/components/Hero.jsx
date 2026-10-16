@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap, ScrollTrigger, goTo, isTouch, reduceMotion } from '../lib/scroll';
-import { PROFILE, PROJECTS } from '../data';
+import { PROFILE } from '../data';
 
 const STAGES = [
-  { k: '01', label: 'Name', cap: 'Ariyan Samal — full-stack engineer' },
-  { k: '02', label: 'Face', cap: 'Hello. Move your cursor — disturb the pixels' },
-  { k: '03', label: 'Code', cap: 'Interface to infrastructure' },
+  { k: '01', label: 'Name' },
+  { k: '02', label: 'Face' },
+  { k: '03', label: 'Code' },
 ];
 
 export default function Hero({ warm, ready, onPalette, onCloud }) {
@@ -36,7 +36,6 @@ export default function Hero({ warm, ready, onPalette, onCloud }) {
     const ctx = gsap.context(() => {
       const fast = reduceMotion();
       gsap.from('.hero__fade', { opacity: 0, y: 26, duration: fast ? 0.01 : 1, stagger: 0.1, ease: 'expo.out', delay: 1.6 });
-      gsap.from('.hero__frame i', { scale: 0, duration: 0.6, stagger: 0.05, ease: 'expo.out', delay: 0.2 });
     }, root);
     return () => ctx.revert();
   }, [ready]);
@@ -50,28 +49,14 @@ export default function Hero({ warm, ready, onPalette, onCloud }) {
     return () => st.kill();
   }, []);
 
-  const cur = STAGES[stage] || STAGES[0];
-  const cap = stage === 1 && isTouch() ? 'Hello. Touch the cloud — disturb the pixels' : cur.cap;
-
   return (
     <section id="top" ref={root} className={`hero ${fallback ? 'is-fallback' : ''}`}>
       <canvas ref={canvas} className="hero__canvas" aria-hidden="true" data-cursor="DISTURB" />
-      <div className="hero__frame" aria-hidden="true"><i /><i /><i /><i /></div>
 
       <h1 className="hero__name">Ariyan Samal<span className="sr-only"> — full-stack engineer in Hyderabad, India</span></h1>
 
-      <div className="hero__meta hero__fade">
-        <span>{PROFILE.location}</span>
-        <span>{PROFILE.coords}</span>
-        <span className="hero__avail"><i className="dot" />Available — freelance & full-time</span>
-      </div>
-
       <div className="hero__foot">
         <div className="hero__copy">
-          <p className="hero__cap hero__fade" key={cur.k}><b>{cur.k}</b>{cap}</p>
-          <p className="hero__lede hero__fade">
-            Building <em>whole products</em> — {PROJECTS.length} shipped, all live.
-          </p>
           <div className="hero__cta hero__fade">
             <button className="btn btn--solid" onClick={() => goTo('work')} data-cursor="GO"><span>See the work</span><i>↓</i></button>
             <button className="btn" onClick={onPalette}><span>Command menu</span><kbd>⌘K</kbd></button>
