@@ -43,7 +43,7 @@ export default function Loader({ onWarm, cloudReady, onReveal, onDone }) {
     let dead = false;
     const timers = new Set();
     const sleep = (ms) => new Promise((res) => {
-      const t = setTimeout(() => { timers.delete(t); res(); }, fast ? ms * 0.22 : ms);
+      const t = setTimeout(() => { timers.delete(t); res(); }, ms * (fast ? 0.22 : 0.5));
       timers.add(t);
     });
 
@@ -82,7 +82,7 @@ export default function Loader({ onWarm, cloudReady, onReveal, onDone }) {
       Hx.appendChild(d);
       while (Hx.children.length > 22) Hx.removeChild(Hx.firstChild);
       meter.current.style.transform = `scaleX(${Math.max(assetFrac(), 0.04)})`;
-    }, fast ? 20 : 70);
+    }, fast ? 20 : 40);
 
     // ── terminal primitives ──
     const caret = document.createElement('span');
@@ -187,7 +187,7 @@ export default function Loader({ onWarm, cloudReady, onReveal, onDone }) {
       const bar = add('');
       let shown = 0;
       const t0 = performance.now();
-      const need = fast ? 400 : 1500;
+      const need = fast ? 300 : 750;
       while (!dead) {
         const target = Math.min(assetFrac(), Math.min(1, (performance.now() - t0) / need));
         shown += (target - shown) * 0.25;
