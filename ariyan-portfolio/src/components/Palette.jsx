@@ -53,6 +53,14 @@ export default function Palette({ open, onClose, onOpenProject }) {
     return undefined;
   }, [open]);
 
+  // Esc closes it wherever focus is (clicking the backdrop or a row moves focus out of the box)
+  useEffect(() => {
+    if (!open) return undefined;
+    const esc = (e) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', esc);
+    return () => window.removeEventListener('keydown', esc);
+  }, [open, onClose]);
+
   const run = (c) => {
     if (!c) return;
     c[2]();
@@ -61,8 +69,7 @@ export default function Palette({ open, onClose, onOpenProject }) {
   };
 
   const onKey = (e) => {
-    if (e.key === 'Escape') onClose();
-    else if (e.key === 'ArrowDown') { e.preventDefault(); setI((n) => Math.min(n + 1, list.length - 1)); }
+    if (e.key === 'ArrowDown') { e.preventDefault(); setI((n) => Math.min(n + 1, list.length - 1)); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); setI((n) => Math.max(n - 1, 0)); }
     else if (e.key === 'Enter') run(list[i]);
   };
