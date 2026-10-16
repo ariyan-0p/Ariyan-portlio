@@ -195,7 +195,7 @@ export default function Loader({ onWarm, cloudReady, onReveal, onDone }) {
 
         // impact: page shake + shockwave through the galaxy + the rest of the site starts to come in
         const main = document.querySelector('main');
-        if (main) gsap.fromTo(main, { x: 0, y: 0 }, { x: () => (Math.random() - 0.5) * 18, y: () => (Math.random() - 0.5) * 14, duration: 0.04, repeat: 11, yoyo: true, ease: 'none', onComplete: () => gsap.set(main, { x: 0, y: 0 }) });
+        if (main) gsap.fromTo(main, { x: 0, y: 0 }, { x: () => (Math.random() - 0.5) * 18, y: () => (Math.random() - 0.5) * 14, duration: 0.04, repeat: 11, yoyo: true, ease: 'none', onComplete: () => gsap.set(main, { clearProps: 'transform' }) }); // a leftover transform would break fixed-position pins (iPhone)
         window.dispatchEvent(new CustomEvent('hero:impact'));
         if (onReveal) onReveal();
 

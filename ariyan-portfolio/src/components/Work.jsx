@@ -107,7 +107,7 @@ export default function Work({ openSlug, setOpenSlug }) {
       </div>
 
       {mode === 'fly' && (near ? (
-        <Suspense fallback={<div className="gal__loading">Loading scene…</div>}>
+        <Suspense fallback={<div className="gal" style={{ height: `${PROJECTS.length * 85 + 100}vh` }} aria-hidden="true" />}>
           <Gallery onOpen={setOpenSlug} onFallback={() => setMode('list')} />
         </Suspense>
       ) : (

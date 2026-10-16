@@ -31,7 +31,12 @@ export default function Gallery({ onOpen, onFallback }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => (isIOS() ? pinStage(wrap.current, wrap.current.querySelector('.gal__stage')) : undefined), []);
+  useEffect(() => {
+    if (!isIOS()) return undefined;
+    const kill = pinStage(wrap.current, wrap.current.querySelector('.gal__stage'));
+    const id = requestAnimationFrame(() => ScrollTrigger.refresh()); // this scene mounts late on phones: re-measure everything
+    return () => { cancelAnimationFrame(id); kill(); };
+  }, []);
 
   const jump = useCallback((i) => {
     const el = wrap.current;
