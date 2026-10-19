@@ -8,7 +8,7 @@ const WEB3FORMS_ACCESS_KEY = '27fbabea-da5e-4cff-9520-6cf096ef7e24';
 const BREVO_ENABLED = false;
 const BREVO_FORM_URL = '';
 
-const PROJECT_TYPES = ['Web App', 'Mobile App', 'E-Commerce', 'SaaS / Platform', 'Other'];
+const PROJECT_TYPES = ['Website', 'Web App', 'Mobile App', 'E-Commerce', 'SaaS / Platform', 'Other'];
 const BUDGETS = ['< ₹25k', '₹25k – ₹75k', '₹75k – ₹2L', '₹2L+', 'Not sure yet'];
 const TIMELINES = ['ASAP', 'Within 1 month', '1 – 3 months', 'Flexible'];
 const TOTAL = 3;
