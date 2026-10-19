@@ -28,7 +28,7 @@ export default function Contact() {
   const [step, setStep] = useState(1);
   const [status, setStatus] = useState('idle'); // idle | loading | success | error
   const [err, setErr] = useState('');
-  const [form, setForm] = useState({ name: '', email: '', projectType: '', budget: '', timeline: '', message: '' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', projectType: '', budget: '', timeline: '', message: '' });
   const set = (k) => (v) => setForm((f) => ({ ...f, [k]: v }));
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export default function Contact() {
   }, []);
 
   const valid = () => {
-    if (step === 1) return form.name.trim() && /\S+@\S+\.\S+/.test(form.email);
+    if (step === 1) return form.name.trim() && /\S+@\S+\.\S+/.test(form.email) && form.phone.replace(/\D/g, '').length >= 7;
     if (step === 2) return form.projectType && form.budget && form.timeline;
     return form.message.trim().length > 0;
   };
@@ -66,7 +66,7 @@ export default function Contact() {
           access_key: WEB3FORMS_ACCESS_KEY,
           subject: `New lead: ${form.name} — ${form.projectType}`,
           from_name: 'Portfolio Contact Form',
-          name: form.name, email: form.email, project_type: form.projectType,
+          name: form.name, email: form.email, phone: form.phone, project_type: form.projectType,
           budget: form.budget, timeline: form.timeline, message: form.message,
         }),
       });
@@ -74,7 +74,7 @@ export default function Contact() {
       if (!data.success) throw new Error(data.message || 'Submission failed.');
       if (BREVO_ENABLED && BREVO_FORM_URL) {
         const b = new FormData();
-        b.append('EMAIL', form.email); b.append('FIRSTNAME', form.name); b.append('PROJECT_TYPE', form.projectType);
+        b.append('EMAIL', form.email); b.append('FIRSTNAME', form.name); b.append('SMS', form.phone); b.append('PROJECT_TYPE', form.projectType);
         b.append('BUDGET', form.budget); b.append('TIMELINE', form.timeline); b.append('MESSAGE', form.message);
         fetch(BREVO_FORM_URL, { method: 'POST', mode: 'no-cors', body: b }).catch(() => {});
       }
@@ -113,7 +113,7 @@ export default function Contact() {
               <pre aria-hidden="true">{'[ ✓ ]'}</pre>
               <h3>Message received.</h3>
               <p>Thanks, {form.name.split(' ')[0]}. I’ll get back to you at {form.email} within a day.</p>
-              <button type="button" className="btn" onClick={() => { setStatus('idle'); setStep(1); setForm({ name: '', email: '', projectType: '', budget: '', timeline: '', message: '' }); }}><span>Send another</span></button>
+              <button type="button" className="btn" onClick={() => { setStatus('idle'); setStep(1); setForm({ name: '', email: '', phone: '', projectType: '', budget: '', timeline: '', message: '' }); }}><span>Send another</span></button>
             </div>
           ) : (
             <>
@@ -127,18 +127,19 @@ export default function Contact() {
                 <div className="form__step" key="s1">
                   <label><span>01 — Name</span><input value={form.name} onChange={(e) => set('name')(e.target.value)} placeholder="Your name" autoComplete="name" /></label>
                   <label><span>02 — Email</span><input type="email" value={form.email} onChange={(e) => set('email')(e.target.value)} placeholder="you@company.com" autoComplete="email" /></label>
+                  <label><span>03 — Phone</span><input type="tel" inputMode="tel" value={form.phone} onChange={(e) => set('phone')(e.target.value)} placeholder="+91 98765 43210" autoComplete="tel" /></label>
                 </div>
               )}
               {step === 2 && (
                 <div className="form__step" key="s2">
-                  <div className="form__q"><span>03 — What are we building?</span><Chips label="Project type" options={PROJECT_TYPES} value={form.projectType} onPick={set('projectType')} /></div>
-                  <div className="form__q"><span>04 — Budget</span><Chips label="Budget" options={BUDGETS} value={form.budget} onPick={set('budget')} /></div>
-                  <div className="form__q"><span>05 — Timeline</span><Chips label="Timeline" options={TIMELINES} value={form.timeline} onPick={set('timeline')} /></div>
+                  <div className="form__q"><span>04 — What are we building?</span><Chips label="Project type" options={PROJECT_TYPES} value={form.projectType} onPick={set('projectType')} /></div>
+                  <div className="form__q"><span>05 — Budget</span><Chips label="Budget" options={BUDGETS} value={form.budget} onPick={set('budget')} /></div>
+                  <div className="form__q"><span>06 — Timeline</span><Chips label="Timeline" options={TIMELINES} value={form.timeline} onPick={set('timeline')} /></div>
                 </div>
               )}
               {step === 3 && (
                 <div className="form__step" key="s3">
-                  <label><span>06 — Tell me about it</span><textarea rows={5} value={form.message} onChange={(e) => set('message')(e.target.value)} placeholder="Goals, references, anything that helps…" /></label>
+                  <label><span>07 — Tell me about it</span><textarea rows={5} value={form.message} onChange={(e) => set('message')(e.target.value)} placeholder="Goals, references, anything that helps…" /></label>
                 </div>
               )}
 
