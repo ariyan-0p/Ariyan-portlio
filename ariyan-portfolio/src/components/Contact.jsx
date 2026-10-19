@@ -127,7 +127,7 @@ export default function Contact() {
                 <div className="form__step" key="s1">
                   <label><span>01 — Name</span><input value={form.name} onChange={(e) => set('name')(e.target.value)} placeholder="Your name" autoComplete="name" /></label>
                   <label><span>02 — Email</span><input type="email" value={form.email} onChange={(e) => set('email')(e.target.value)} placeholder="you@company.com" autoComplete="email" /></label>
-                  <label><span>03 — Phone</span><input type="tel" inputMode="tel" value={form.phone} onChange={(e) => set('phone')(e.target.value)} placeholder="+91 98765 43210" autoComplete="tel" /></label>
+                  <label><span>03 — Phone</span><input type="tel" inputMode="tel" value={form.phone} onChange={(e) => set('phone')(e.target.value)} placeholder="Your phone number" autoComplete="tel" /></label>
                 </div>
               )}
               {step === 2 && (
