@@ -18,77 +18,84 @@ export const PROFILE = {
 // Order = order on the page. `featured` projects get a marker in the index.
 export const PROJECTS = [
   {
-    id: '01', slug: 'gripl', title: 'GRIPL India', category: 'Construction Marketplace', type: 'E-Commerce',
+    id: '01', slug: 'candle', title: 'Candle Cove', category: 'Handcrafted Candle Store', type: 'E-Commerce',
+    year: '2026', url: 'candllecove.com', link: 'https://candllecove.com/', shot: shot('candle'), thumb: thumb('candle'),
+    tech: ['Next.js', 'React', 'GSAP'],
+    desc: 'A warm, story-led storefront for hand-poured candles — festive drops, collections and a smooth cart, lit with a glowing diya hero.',
+    accent: '#ff8a3d',
+  },
+  {
+    id: '02', slug: 'gripl', title: 'GRIPL India', category: 'Construction Marketplace', type: 'E-Commerce',
     year: '2026', url: 'griplindia.com', link: 'https://griplindia.com/', shot: shot('gripl'), thumb: thumb('gripl'),
     tech: ['React', 'Node.js', 'Tailwind'],
     desc: "Bhopal's build marketplace — materials, machinery, manpower and property sourced, priced and dispatched from one quote-driven storefront.",
     accent: '#ff6a1f', featured: true,
   },
   {
-    id: '02', slug: 'anjna', title: 'Anjna Global', category: 'Travel DMC', type: 'Web',
+    id: '03', slug: 'anjna', title: 'Anjna Global', category: 'Travel DMC', type: 'Web',
     year: '2026', url: 'anjnaglobal.com', link: 'https://anjnaglobal.com/', shot: shot('anjna'), thumb: thumb('anjna'),
     tech: ['React', 'Node.js', 'Tailwind'],
     desc: 'A destination management platform for the travel trade — net rates, packages and quote workflows across five signature regions.',
     accent: '#e5484d',
   },
   {
-    id: '03', slug: 'creoit', title: 'Creoit', category: 'Creative Agency', type: 'Web',
+    id: '04', slug: 'creoit', title: 'Creoit', category: 'Creative Agency', type: 'Web',
     year: '2026', url: 'creoit.in', link: 'https://creoit.in/', shot: shot('creoit'), thumb: thumb('creoit'),
     tech: ['React', 'Three.js', 'Motion'],
     desc: 'A 360° creative marketing agency site — branding, performance ads and growth, with an interactive draggable globe.',
     accent: '#7c5cff', featured: true,
   },
   {
-    id: '04', slug: 'beyond', title: 'Beyond Honeymoons', category: 'Luxury Travel', type: 'Web',
+    id: '05', slug: 'beyond', title: 'Beyond Honeymoons', category: 'Luxury Travel', type: 'Web',
     year: '2026', url: 'beyondhoneymoons.com', link: 'https://beyondhoneymoons.com/', shot: shot('beyond'), thumb: thumb('beyond'),
     tech: ['React', 'Framer Motion', 'Tailwind'],
     desc: 'Bespoke, hand-built honeymoon and milestone trips — a scroll-driven storefront with a draggable memory wall.',
     accent: '#16a394',
   },
   {
-    id: '05', slug: 'carvaan', title: 'Carvaan Holidays', category: 'Travel & Tourism', type: 'Web',
+    id: '06', slug: 'carvaan', title: 'Carvaan Holidays', category: 'Travel & Tourism', type: 'Web',
     year: '2026', url: 'carvaanholidays.com', link: 'https://carvaanholidays.com/', shot: shot('carvaan'), thumb: thumb('carvaan'),
     tech: ['React', 'Node.js', 'Tailwind'],
     desc: 'A travel discovery platform — curated journeys and seamless booking for the modern explorer.',
     accent: '#f5a524',
   },
   {
-    id: '06', slug: 'puravida', title: 'Puravida with Harsha', category: 'Wellness & Lifestyle', type: 'Web',
+    id: '07', slug: 'puravida', title: 'Puravida with Harsha', category: 'Wellness & Lifestyle', type: 'Web',
     year: '2026', url: 'puravidawithharsha.com', link: 'https://puravidawithharsha.com/', shot: shot('puravida'), thumb: thumb('puravida'),
     tech: ['React', 'Node.js', 'MongoDB'],
     desc: "A wellness platform built around a creator's voice — content, coaching and community in one calm space.",
     accent: '#46a758',
   },
   {
-    id: '07', slug: 'eyzo', title: 'Eyzo', category: 'Digital Product', type: 'Web',
+    id: '08', slug: 'eyzo', title: 'Eyzo', category: 'Digital Product', type: 'Web',
     year: '2026', url: 'eyzo.in', link: 'https://eyzo.in/', shot: shot('eyzo'), thumb: thumb('eyzo'),
     tech: ['Next.js', 'Node.js', 'Tailwind'],
     desc: 'A modern digital product experience — crafted for speed, clarity and a strong first impression.',
     accent: '#0ea5e9',
   },
   {
-    id: '08', slug: 'keystone', title: 'Keystone Projects', category: 'Architectural Portfolio', type: 'Web',
+    id: '09', slug: 'keystone', title: 'Keystone Projects', category: 'Architectural Portfolio', type: 'Web',
     year: '2025', url: 'keystoneprojects.in', link: 'https://keystoneprojects.in/', shot: shot('keystone'), thumb: thumb('keystone'),
     tech: ['React', 'Tailwind', 'Motion'],
     desc: 'A bold digital presence for an architectural firm — spatial storytelling through the web.',
     accent: '#f59e0b', featured: true,
   },
   {
-    id: '09', slug: 'bounten', title: 'Bounten App', category: 'LMS Platform', type: 'Mobile',
+    id: '10', slug: 'bounten', title: 'Bounten App', category: 'LMS Platform', type: 'Mobile',
     year: '2025', url: 'play.google.com', link: 'https://play.google.com/store/apps/details?id=com.bounten.profitpartner', shot: shot('bounten'), thumb: thumb('bounten'),
     tech: ['Flutter', 'Node.js', 'Firebase'],
     desc: 'A learning management system built for scale — mobile-first, fast and frictionless.',
     accent: '#3b82f6',
   },
   {
-    id: '10', slug: 'renobill', title: 'Reno Bill', category: 'Billing SaaS', type: 'SaaS',
+    id: '11', slug: 'renobill', title: 'Reno Bill', category: 'Billing SaaS', type: 'SaaS',
     year: '2025', url: 'renobill.com', link: 'https://renobill.com/', shot: shot('renobill'), thumb: thumb('renobill'),
     tech: ['MongoDB', 'Express', 'React', 'Node.js'],
     desc: 'Billing infrastructure stripped to its essence — fast invoicing for modern businesses.',
     accent: '#8e4ec6',
   },
   {
-    id: '11', slug: 'nts', title: 'NTS with Ankit', category: 'Personal Brand', type: 'Web',
+    id: '12', slug: 'nts', title: 'NTS with Ankit', category: 'Personal Brand', type: 'Web',
     year: '2025', url: 'ntswithankit.com', link: 'https://ntswithankit.com/', shot: shot('nts'), thumb: thumb('nts'),
     tech: ['MongoDB', 'Express', 'React', 'Node.js'],
     desc: 'A personal brand platform built with conviction — content, community and credibility.',
@@ -130,7 +137,7 @@ export const LOG = [
   { hash: '9d35b02', kind: 'edu', role: 'Diploma, Computer Science', org: 'UCP Engineering School', place: 'Berhampur', date: 'Jun 2018 — Jul 2021', msg: 'Foundations in computer science, networking and programming logic.' },
 ];
 
-export const CLIENTS = ['Keystone Projects', 'NTS', 'Bounten', 'Renobill', 'Sharkify AI', 'Kaizernews', 'Carvaan Holidays', 'Creoit', 'GRIPL India', 'Anjna Global'];
+export const CLIENTS = ['Keystone Projects', 'NTS', 'Bounten', 'Renobill', 'Sharkify AI', 'Kaizernews', 'Carvaan Holidays', 'Creoit', 'Candle Cove', 'GRIPL India', 'Anjna Global'];
 export const STACK = ['React', 'Next.js', 'Node.js', 'Flutter', 'Go', 'Python', 'TensorFlow', 'MongoDB', 'Firebase', 'AWS', 'Docker', 'GSAP', 'WebGL', 'Tailwind'];
 
 export const SECTIONS = [
